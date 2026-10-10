@@ -45,11 +45,25 @@ export default defineConfig({
         },
         workbox: {
           globPatterns: ["**/*.{js,css,html,svg,png,woff2,webmanifest}"],
-          navigateFallback: "/_shell.html",
-          navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//, /^\/_serverFn\//],
+          navigateFallback: null,
           cleanupOutdatedCaches: true,
-          // No runtime caching: Supabase and auth requests always go to the network.
-          runtimeCaching: [],
+          // Only same-origin page navigations are handled: network first, falling
+          // back to the precached app shell when offline. Supabase and auth
+          // requests are never cached.
+          runtimeCaching: [
+            {
+              urlPattern: ({ request, url }) =>
+                request.mode === "navigate" &&
+                url.origin === self.location.origin &&
+                !url.pathname.startsWith("/~oauth"),
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "yard-pages",
+                networkTimeoutSeconds: 4,
+                precacheFallback: { fallbackURL: "/_shell.html" },
+              },
+            },
+          ],
         },
       }),
     ],
