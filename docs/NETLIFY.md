@@ -11,10 +11,10 @@
 Yard needs two variables at build time. In Netlify open
 **Site configuration > Environment variables > Add a variable** and add:
 
-| Key                      | Value                                                           |
-| ------------------------ | --------------------------------------------------------------- |
-| `VITE_SUPABASE_URL`      | Supabase > Project Settings > API > Project URL                 |
-| `VITE_SUPABASE_ANON_KEY` | Supabase > Project Settings > API > `anon` `public` key         |
+| Key                      | Value                                                   |
+| ------------------------ | ------------------------------------------------------- |
+| `VITE_SUPABASE_URL`      | Supabase > Project Settings > API > Project URL         |
+| `VITE_SUPABASE_ANON_KEY` | Supabase > Project Settings > API > `anon` `public` key |
 
 Never add the service-role key. After adding or changing a variable, run
 **Deploys > Trigger deploy > Clear cache and deploy site**, because the values are

@@ -70,7 +70,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Yard" },
       { name: "description", content: "Rent and tenant management for backyard-room landlords." },
       { property: "og:title", content: "Yard" },
-      { property: "og:description", content: "Rent and tenant management for backyard-room landlords." },
+      {
+        property: "og:description",
+        content: "Rent and tenant management for backyard-room landlords.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

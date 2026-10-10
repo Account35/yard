@@ -136,7 +136,13 @@ export default function DevKit() {
             trailing={<span className="money">{formatMoney(120000)}</span>}
           />
           <ListRow primary="With chevron" chevron onClick={() => undefined} />
-          <ListRow primary="Everything" secondary="Secondary" trailing={<StatusTag status="paid" />} chevron onClick={() => undefined} />
+          <ListRow
+            primary="Everything"
+            secondary="Secondary"
+            trailing={<StatusTag status="paid" />}
+            chevron
+            onClick={() => undefined}
+          />
         </ul>
       </Section>
 
@@ -150,14 +156,23 @@ export default function DevKit() {
       </Section>
 
       <Section title="EmptyState">
-        <EmptyState message="There is nothing here yet." actionLabel="Add something" onAction={() => undefined} />
+        <EmptyState
+          message="There is nothing here yet."
+          actionLabel="Add something"
+          onAction={() => undefined}
+        />
       </Section>
 
       <Section title="Sheet">
         <Button variant="secondary" onClick={() => setSheetOpen(true)}>
           Open sheet
         </Button>
-        <Sheet open={sheetOpen} onOpenChange={setSheetOpen} title="Example sheet" description="Bottom sheet on phones, centred on wider screens.">
+        <Sheet
+          open={sheetOpen}
+          onOpenChange={setSheetOpen}
+          title="Example sheet"
+          description="Bottom sheet on phones, centred on wider screens."
+        >
           <div className="flex flex-col gap-4">
             <Input label="Amount" prefix="R" inputMode="decimal" />
             <Button fullWidth onClick={() => setSheetOpen(false)}>

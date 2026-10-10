@@ -14,7 +14,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Main"
-      className="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-line bg-ground"
+      className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-ground pb-safe"
     >
       <ul className="mx-auto grid max-w-2xl grid-cols-4">
         {items.map(({ to, label, Icon }) => (

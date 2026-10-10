@@ -23,7 +23,11 @@ export function ListRow({ primary, secondary, trailing, chevron = false, onClick
       </span>
       {trailing !== undefined && <span className="shrink-0 text-body">{trailing}</span>}
       {chevron && (
-        <ChevronRight aria-hidden="true" className="size-5 shrink-0 text-ink-muted" strokeWidth={1.5} />
+        <ChevronRight
+          aria-hidden="true"
+          className="size-5 shrink-0 text-ink-muted"
+          strokeWidth={1.5}
+        />
       )}
     </>
   );

@@ -54,6 +54,7 @@ export function formatMoney(cents: Cents, options: FormatMoneyOptions = {}): str
   const rands = Math.floor(abs / 100);
   const rest = abs % 100;
   const showCents = options.showCents === "always" || rest !== 0;
-  const body = groupThousands(String(rands)) + (showCents ? "," + String(rest).padStart(2, "0") : "");
+  const body =
+    groupThousands(String(rands)) + (showCents ? "," + String(rest).padStart(2, "0") : "");
   return (negative ? "-" : "") + "R" + body;
 }

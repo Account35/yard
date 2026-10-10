@@ -30,8 +30,10 @@ export function parseSAPhone(input: string): ParsePhoneResult {
     return { ok: false, error: "Start with 0 or +27" };
   }
 
-  if (digits.length !== 9) return { ok: false, error: "A mobile number has 10 digits, like 082 123 4567" };
-  if (!/^[678]/.test(digits)) return { ok: false, error: "This looks like a landline. Use a mobile number" };
+  if (digits.length !== 9)
+    return { ok: false, error: "A mobile number has 10 digits, like 082 123 4567" };
+  if (!/^[678]/.test(digits))
+    return { ok: false, error: "This looks like a landline. Use a mobile number" };
 
   const local = "0" + digits;
   return {
