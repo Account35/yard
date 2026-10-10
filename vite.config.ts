@@ -9,7 +9,7 @@ import { VitePWA } from "vite-plugin-pwa";
 // Netlify sets NETLIFY=true during its builds. Keep the client output in
 // dist/client there too, so the service worker settings below stay valid.
 const netlifyNitro = process.env["NETLIFY"]
-  ? { preset: "netlify", output: { publicDir: "dist/client" } }
+  ? { preset: "node-server", output: { dir: "dist", serverDir: "dist/server", publicDir: "dist/client" } }
   : undefined;
 
 export default defineConfig({
