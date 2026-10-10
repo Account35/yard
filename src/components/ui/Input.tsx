@@ -4,8 +4,8 @@ import { cn } from "@/lib/utils";
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "prefix"> {
   label: string;
-  helper?: string;
-  error?: string;
+  helper?: string | undefined;
+  error?: string | undefined;
   /** Shown inside the field before the value, for example "R". */
   prefix?: ReactNode;
 }
