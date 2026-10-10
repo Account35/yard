@@ -8,3 +8,11 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+# Project rules
+
+- Read docs/CONVENTIONS.md before every change; it is the source of truth for structure, naming and design rules.
+- Pages live in src/pages and are lazy-loaded from thin route files in src/routes; keeps first load small.
+- The app builds in TanStack Start spa mode; Netlify serves dist/client statically with a rewrite to /_shell.html, so there are no server functions in production.
+- Supabase is the user's own project, reached only from the browser via src/lib/supabase.ts with the anon key; never use a service-role key.
+- The service worker is registered only from src/lib/pwa.ts and never caches Supabase or auth requests.
