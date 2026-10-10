@@ -1,14 +1,16 @@
-import { Navigate } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/Button";
 
 import { useLandlord } from "../hooks";
 import { Loading } from "./Loading";
+import { useRedirectWhen } from "./useRedirect";
 
 /** Use inside RequireAuth. */
 export function RequireOnboarded({ children }: { children: ReactNode }) {
   const landlord = useLandlord();
+  const needsOnboarding = landlord.isSuccess && !landlord.data?.onboarding_completed_at;
+  useRedirectWhen(needsOnboarding, "/onboarding");
   if (landlord.isPending) return <Loading />;
   if (landlord.isError) {
     return (
@@ -20,6 +22,6 @@ export function RequireOnboarded({ children }: { children: ReactNode }) {
       </main>
     );
   }
-  if (!landlord.data?.onboarding_completed_at) return <Navigate to="/onboarding" replace />;
+  if (needsOnboarding) return <Loading />;
   return <>{children}</>;
 }
