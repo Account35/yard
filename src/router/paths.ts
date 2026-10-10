@@ -7,4 +7,6 @@ export const paths = {
   settings: "/settings",
   tenant: "/t/$token",
   devKit: "/dev/kit",
+  SIGN_IN: "/sign-in",
+  ONBOARDING: "/onboarding",
 } as const;
