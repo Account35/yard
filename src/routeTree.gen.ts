@@ -10,33 +10,114 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LandlordRouteImport } from './routes/_landlord'
+import { Route as TenantRouteImport } from './routes/_tenant'
+import { Route as LandlordHomeRouteImport } from './routes/_landlord.home'
+import { Route as LandlordMoneyRouteImport } from './routes/_landlord.money'
+import { Route as LandlordRoomsRouteImport } from './routes/_landlord.rooms'
+import { Route as LandlordSettingsRouteImport } from './routes/_landlord.settings'
+import { Route as DevKitRouteImport } from './routes/dev.kit'
+import { Route as TenantTTokenRouteImport } from './routes/_tenant.t.$token'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LandlordRoute = LandlordRouteImport.update({
+  id: '/_landlord',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TenantRoute = TenantRouteImport.update({
+  id: '/_tenant',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LandlordHomeRoute = LandlordHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => LandlordRoute,
+} as any)
+const LandlordMoneyRoute = LandlordMoneyRouteImport.update({
+  id: '/money',
+  path: '/money',
+  getParentRoute: () => LandlordRoute,
+} as any)
+const LandlordRoomsRoute = LandlordRoomsRouteImport.update({
+  id: '/rooms',
+  path: '/rooms',
+  getParentRoute: () => LandlordRoute,
+} as any)
+const LandlordSettingsRoute = LandlordSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => LandlordRoute,
+} as any)
+const DevKitRoute = DevKitRouteImport.update({
+  id: '/dev/kit',
+  path: '/dev/kit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TenantTTokenRoute = TenantTTokenRouteImport.update({
+  id: '/t/$token',
+  path: '/t/$token',
+  getParentRoute: () => TenantRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/home': typeof LandlordHomeRoute
+  '/money': typeof LandlordMoneyRoute
+  '/rooms': typeof LandlordRoomsRoute
+  '/settings': typeof LandlordSettingsRoute
+  '/dev/kit': typeof DevKitRoute
+  '/t/$token': typeof TenantTTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/home': typeof LandlordHomeRoute
+  '/money': typeof LandlordMoneyRoute
+  '/rooms': typeof LandlordRoomsRoute
+  '/settings': typeof LandlordSettingsRoute
+  '/dev/kit': typeof DevKitRoute
+  '/t/$token': typeof TenantTTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_landlord': typeof LandlordRouteWithChildren
+  '/_tenant': typeof TenantRouteWithChildren
+  '/_landlord/home': typeof LandlordHomeRoute
+  '/_landlord/money': typeof LandlordMoneyRoute
+  '/_landlord/rooms': typeof LandlordRoomsRoute
+  '/_landlord/settings': typeof LandlordSettingsRoute
+  '/dev/kit': typeof DevKitRoute
+  '/_tenant/t/$token': typeof TenantTTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/home' | '/money' | '/rooms' | '/settings' | '/dev/kit' | '/t/$token'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    '/' | '/home' | '/money' | '/rooms' | '/settings' | '/dev/kit' | '/t/$token'
+  id:
+    | '__root__'
+    | '/'
+    | '/_landlord'
+    | '/_tenant'
+    | '/_landlord/home'
+    | '/_landlord/money'
+    | '/_landlord/rooms'
+    | '/_landlord/settings'
+    | '/dev/kit'
+    | '/_tenant/t/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LandlordRoute: typeof LandlordRouteWithChildren
+  TenantRoute: typeof TenantRouteWithChildren
+  DevKitRoute: typeof DevKitRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +129,99 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_landlord': {
+      id: '/_landlord'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof LandlordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_tenant': {
+      id: '/_tenant'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof TenantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_landlord/home': {
+      id: '/_landlord/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof LandlordHomeRouteImport
+      parentRoute: typeof LandlordRoute
+    }
+    '/_landlord/money': {
+      id: '/_landlord/money'
+      path: '/money'
+      fullPath: '/money'
+      preLoaderRoute: typeof LandlordMoneyRouteImport
+      parentRoute: typeof LandlordRoute
+    }
+    '/_landlord/rooms': {
+      id: '/_landlord/rooms'
+      path: '/rooms'
+      fullPath: '/rooms'
+      preLoaderRoute: typeof LandlordRoomsRouteImport
+      parentRoute: typeof LandlordRoute
+    }
+    '/_landlord/settings': {
+      id: '/_landlord/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof LandlordSettingsRouteImport
+      parentRoute: typeof LandlordRoute
+    }
+    '/dev/kit': {
+      id: '/dev/kit'
+      path: '/dev/kit'
+      fullPath: '/dev/kit'
+      preLoaderRoute: typeof DevKitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_tenant/t/$token': {
+      id: '/_tenant/t/$token'
+      path: '/t/$token'
+      fullPath: '/t/$token'
+      preLoaderRoute: typeof TenantTTokenRouteImport
+      parentRoute: typeof TenantRoute
+    }
   }
 }
 
+interface LandlordRouteChildren {
+  LandlordHomeRoute: typeof LandlordHomeRoute
+  LandlordMoneyRoute: typeof LandlordMoneyRoute
+  LandlordRoomsRoute: typeof LandlordRoomsRoute
+  LandlordSettingsRoute: typeof LandlordSettingsRoute
+}
+
+const LandlordRouteChildren: LandlordRouteChildren = {
+  LandlordHomeRoute: LandlordHomeRoute,
+  LandlordMoneyRoute: LandlordMoneyRoute,
+  LandlordRoomsRoute: LandlordRoomsRoute,
+  LandlordSettingsRoute: LandlordSettingsRoute,
+}
+
+const LandlordRouteWithChildren = LandlordRoute._addFileChildren(
+  LandlordRouteChildren,
+)
+
+interface TenantRouteChildren {
+  TenantTTokenRoute: typeof TenantTTokenRoute
+}
+
+const TenantRouteChildren: TenantRouteChildren = {
+  TenantTTokenRoute: TenantTTokenRoute,
+}
+
+const TenantRouteWithChildren =
+  TenantRoute._addFileChildren(TenantRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LandlordRoute: LandlordRouteWithChildren,
+  TenantRoute: TenantRouteWithChildren,
+  DevKitRoute: DevKitRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
@@ -16,7 +16,7 @@ import { supabase } from "@/lib/supabase";
 
 const sampleAmounts = [0, 5000, 120000, 125050, -5000, 123456789];
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-3 border-t border-line py-6">
       <h2 className="text-body font-semibold text-ink">{title}</h2>
