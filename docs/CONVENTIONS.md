@@ -128,3 +128,21 @@ Differences from the original Phase 0 brief, required by the framework:
 - Tap targets at least 44px; buttons 48px high. No red button: destructive actions use
   the secondary variant with clear wording.
 - Plain human copy, no exclamation marks.
+
+## Auth and onboarding (Phase 1)
+
+- Landlords sign in with phone OTP (`supabase.auth.signInWithOtp` with the E.164 number).
+  `AuthProvider` (mounted in `__root.tsx`) exposes `useAuth()`; `useLandlord()` loads the
+  landlord row. `RequireAuth` and `RequireOnboarded` (in `features/auth/components`) wrap
+  the `_landlord` layout. `/sign-in` and `/onboarding` are outside it.
+- Ownership helpers: `public.owns_property(property_id)` and `public.owns_room(room_id)`
+  (security definer, check `auth.uid()`). Every later table's RLS policies must reuse
+  these instead of repeating joins.
+- `public.complete_onboarding(p_name, p_language, p_property_name, p_address, p_rooms jsonb)`
+  creates the landlord, property and rooms in one call as the signed-in user. It raises
+  `Onboarding already completed` on a repeat call, which the app treats as success.
+- Allowed values: `landlords.language` is `en`, `zu`, `xh` or `st` (English, isiZulu,
+  isiXhosa, Sesotho; used for WhatsApp messages, app screens stay English).
+  `landlords.reminder_tone` is `friendly` or `firm`.
+- Rooms are never deleted (no delete policy); set `is_active = false` instead.
+- The onboarding draft lives in localStorage under `yard.onboarding.draft`.

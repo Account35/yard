@@ -13,6 +13,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/Button";
+import { AuthProvider } from "@/features/auth/AuthProvider";
 import { envResult } from "@/lib/env";
 import { registerServiceWorker } from "@/lib/pwa";
 import NotFound from "@/pages/NotFound";
@@ -115,7 +116,9 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <AuthProvider>
+        <Outlet />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

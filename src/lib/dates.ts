@@ -72,3 +72,11 @@ export function dueDateFor(period: Period, dueDay: number): ISODate {
   const day = Math.min(dueDay, getDaysInMonth(monthStart));
   return `${period}-${format(new Date(2000, 0, day), "dd")}`;
 }
+
+/** 1 → "1st", 2 → "2nd", 11 → "11th", 22 → "22nd". */
+export function ordinal(n: number): string {
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${n}th`;
+  const suffix = ({ 1: "st", 2: "nd", 3: "rd" } as Record<number, string>)[n % 10] ?? "th";
+  return `${n}${suffix}`;
+}

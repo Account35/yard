@@ -1,6 +1,6 @@
 # Migrations
 
-No tables exist yet. Phase 1 adds the first migration in `supabase/migrations/`.
+Migrations live in `supabase/migrations/`, starting with `0001_core_tables.sql`.
 
 - Name files with a four-digit number and a short name, for example `0001_core_tables.sql`.
 - Never edit an old migration. Every change is a new numbered file.

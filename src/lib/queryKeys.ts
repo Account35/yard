@@ -3,4 +3,15 @@ export const queryKeys = {
   dev: {
     supabaseSession: ["dev", "supabase-session"] as const,
   },
+  landlord: {
+    all: ["landlord"] as const,
+    me: (userId: string) => ["landlord", userId] as const,
+  },
+  properties: {
+    all: ["properties"] as const,
+  },
+  rooms: {
+    all: ["rooms"] as const,
+    active: ["rooms", "active"] as const,
+  },
 } as const;
