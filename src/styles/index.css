@@ -1,0 +1,138 @@
+@import "tailwindcss" source(none);
+@source "../../src";
+
+/*
+ * Yard design tokens. Calm ledger look: off-white ground, near-black ink,
+ * one deep green for primary actions, status colours only for payment status.
+ * Contrast (text on ground #FAFAF7): ink 16.9:1, ink-muted 5.1:1,
+ * brand 7.6:1, status-late 5.7:1, status-part-ink 6.0:1.
+ */
+
+@theme {
+  /* Reset library defaults so only Yard tokens exist. */
+  --color-*: initial;
+  --text-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --font-*: initial;
+
+  --color-ground: #fafaf7;
+  --color-ink: #1a1a1a;
+  --color-ink-muted: #6b6b6b;
+  --color-line: #e3e2dc;
+  --color-line-strong: #1a1a1a;
+  --color-surface: #ffffff;
+  --color-brand: #1f5f3f;
+  --color-brand-pressed: #174a31;
+  --color-on-brand: #fafaf7;
+  --color-status-paid: #1f5f3f;
+  /* #B7791F is the amber; text uses a darker tone to reach 4.5:1. */
+  --color-status-part: #b7791f;
+  --color-status-part-ink: #87580f;
+  --color-status-late: #b23b3b;
+  --color-status-neutral: #6b6b6b;
+  --color-backdrop: rgb(0 0 0 / 0.4);
+
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  /* Exactly three type sizes. */
+  --text-secondary: 14px;
+  --text-secondary--line-height: 20px;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+  --text-title: 24px;
+  --text-title--line-height: 32px;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+
+  --spacing: 4px;
+  --spacing-gutter: 16px;
+
+  --font-weight-normal: 400;
+  --font-weight-semibold: 600;
+}
+
+@utility money {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+    font-size: 16px;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@utility animate-sheet-up {
+  animation: sheet-up 200ms ease-out;
+}
+
+@utility animate-fade-in {
+  animation: fade-in 150ms ease-out;
+}
