@@ -1,8 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import Banknote from "lucide-react/dist/esm/icons/banknote";
-import DoorClosed from "lucide-react/dist/esm/icons/door-closed";
-import House from "lucide-react/dist/esm/icons/house";
-import Settings from "lucide-react/dist/esm/icons/settings";
+import { Banknote, DoorClosed, House, Settings } from "lucide-react";
 
 import { paths } from "@/router/paths";
 
