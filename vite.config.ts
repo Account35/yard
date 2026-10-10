@@ -20,6 +20,8 @@ export default defineConfig({
         injectRegister: null,
         devOptions: { enabled: false },
         filename: "sw.js",
+        // Client output only; the server bundle must never be precached.
+        outDir: "dist/client",
         manifestFilename: "manifest.webmanifest",
         includeAssets: ["icons/*.png", "icons/*.svg"],
         manifest: {
@@ -44,6 +46,9 @@ export default defineConfig({
           ],
         },
         workbox: {
+          globDirectory: "dist/client",
+          // The shell is prerendered after this plugin runs, so list it explicitly.
+          additionalManifestEntries: [{ url: "/_shell.html", revision: String(Date.now()) }],
           globPatterns: ["**/*.{js,css,html,svg,png,woff2,webmanifest}"],
           navigateFallback: null,
           cleanupOutdatedCaches: true,
