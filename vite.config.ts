@@ -3,11 +3,17 @@
 //   - TanStack devtools (dev-only, first), tanstackStart, viteReact, tailwindcss, tsConfigPaths,
 //     nitro (build-only using cloudflare as a default target), VITE_* env injection, @ path alias,
 //     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
-// On Netlify, NITRO_PRESET=netlify (set in netlify.toml) switches the build target.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { VitePWA } from "vite-plugin-pwa";
 
+// Netlify sets NETLIFY=true during its builds. Keep the client output in
+// dist/client there too, so the service worker settings below stay valid.
+const netlifyNitro = process.env["NETLIFY"]
+  ? { preset: "netlify", output: { publicDir: "dist/client" } }
+  : undefined;
+
 export default defineConfig({
+  ...(netlifyNitro ? { nitro: netlifyNitro } : {}),
   tanstackStart: {
     server: { entry: "server" },
     // Client-rendered app with a prerendered shell, used as the offline fallback.
