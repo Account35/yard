@@ -16,11 +16,12 @@ export const roomSchema = z.object({
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Rent must be more than R0" });
     }
   }),
-  dueDay: z.coerce
-    .number()
-    .int()
-    .min(1, "Choose a day from 1 to 28")
-    .max(28, "Choose a day from 1 to 28"),
+  dueDay: z
+    .string()
+    .refine(
+      (v) => /^\d{1,2}$/.test(v) && Number(v) >= 1 && Number(v) <= 28,
+      "Choose a day from 1 to 28",
+    ),
 });
 
 export const aboutSchema = z.object({

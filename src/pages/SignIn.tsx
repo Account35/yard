@@ -9,7 +9,7 @@ import { useAuth } from "@/features/auth/useAuth";
 import type { SAPhone } from "@/lib/phone";
 import { paths } from "@/router/paths";
 
-export default function SignIn({ redirect }: { redirect?: string }) {
+export default function SignIn({ redirect }: { redirect?: string | undefined }) {
   const { session, isLoading } = useAuth();
   const router = useRouter();
   const [phone, setPhone] = useState<SAPhone | null>(null);
