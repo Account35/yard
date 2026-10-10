@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LandlordRouteImport } from './routes/_landlord'
 import { Route as TenantRouteImport } from './routes/_tenant'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as LandlordHomeRouteImport } from './routes/_landlord.home'
 import { Route as LandlordMoneyRouteImport } from './routes/_landlord.money'
 import { Route as LandlordRoomsRouteImport } from './routes/_landlord.rooms'
@@ -30,6 +32,16 @@ const LandlordRoute = LandlordRouteImport.update({
 } as any)
 const TenantRoute = TenantRouteImport.update({
   id: '/_tenant',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LandlordHomeRoute = LandlordHomeRouteImport.update({
@@ -65,6 +77,8 @@ const TenantTTokenRoute = TenantTTokenRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/onboarding': typeof OnboardingRoute
+  '/sign-in': typeof SignInRoute
   '/home': typeof LandlordHomeRoute
   '/money': typeof LandlordMoneyRoute
   '/rooms': typeof LandlordRoomsRoute
@@ -74,6 +88,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/onboarding': typeof OnboardingRoute
+  '/sign-in': typeof SignInRoute
   '/home': typeof LandlordHomeRoute
   '/money': typeof LandlordMoneyRoute
   '/rooms': typeof LandlordRoomsRoute
@@ -86,6 +102,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_landlord': typeof LandlordRouteWithChildren
   '/_tenant': typeof TenantRouteWithChildren
+  '/onboarding': typeof OnboardingRoute
+  '/sign-in': typeof SignInRoute
   '/_landlord/home': typeof LandlordHomeRoute
   '/_landlord/money': typeof LandlordMoneyRoute
   '/_landlord/rooms': typeof LandlordRoomsRoute
@@ -96,15 +114,33 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/home' | '/money' | '/rooms' | '/settings' | '/dev/kit' | '/t/$token'
+    | '/'
+    | '/onboarding'
+    | '/sign-in'
+    | '/home'
+    | '/money'
+    | '/rooms'
+    | '/settings'
+    | '/dev/kit'
+    | '/t/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/home' | '/money' | '/rooms' | '/settings' | '/dev/kit' | '/t/$token'
+    | '/'
+    | '/onboarding'
+    | '/sign-in'
+    | '/home'
+    | '/money'
+    | '/rooms'
+    | '/settings'
+    | '/dev/kit'
+    | '/t/$token'
   id:
     | '__root__'
     | '/'
     | '/_landlord'
     | '/_tenant'
+    | '/onboarding'
+    | '/sign-in'
     | '/_landlord/home'
     | '/_landlord/money'
     | '/_landlord/rooms'
@@ -117,6 +153,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LandlordRoute: typeof LandlordRouteWithChildren
   TenantRoute: typeof TenantRouteWithChildren
+  OnboardingRoute: typeof OnboardingRoute
+  SignInRoute: typeof SignInRoute
   DevKitRoute: typeof DevKitRoute
 }
 
@@ -141,6 +179,20 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof TenantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_landlord/home': {
@@ -221,6 +273,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LandlordRoute: LandlordRouteWithChildren,
   TenantRoute: TenantRouteWithChildren,
+  OnboardingRoute: OnboardingRoute,
+  SignInRoute: SignInRoute,
   DevKitRoute: DevKitRoute,
 }
 export const routeTree = rootRouteImport

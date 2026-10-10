@@ -54,3 +54,13 @@ describe("dueDateFor", () => {
     expect(() => dueDateFor("2026-10", 32)).toThrow();
   });
 });
+
+describe("ordinal", () => {
+  it.each([
+    [1, "1st"], [2, "2nd"], [3, "3rd"], [4, "4th"], [11, "11th"], [12, "12th"],
+    [13, "13th"], [21, "21st"], [22, "22nd"], [23, "23rd"], [28, "28th"],
+  ])("%i → %s", async (n, out) => {
+    const { ordinal } = await import("./dates");
+    expect(ordinal(n)).toBe(out);
+  });
+});
