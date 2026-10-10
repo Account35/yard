@@ -18,7 +18,13 @@ const DAY_OPTIONS = Array.from({ length: 28 }, (_, i) => ({
   label: String(i + 1),
 }));
 
-function BulkAdd({ onAdd, onCancel }: { onAdd: (count: number, rent: string, day: string) => void; onCancel: () => void }) {
+function BulkAdd({
+  onAdd,
+  onCancel,
+}: {
+  onAdd: (count: number, rent: string, day: string) => void;
+  onCancel: () => void;
+}) {
   const [count, setCount] = useState("");
   const [rent, setRent] = useState("");
   const [day, setDay] = useState("1");
@@ -50,7 +56,12 @@ function BulkAdd({ onAdd, onCancel }: { onAdd: (count: number, rent: string, day
         value={rent}
         onChange={(e) => setRent(e.target.value)}
       />
-      <Select label="Due day" options={DAY_OPTIONS} value={day} onChange={(e) => setDay(e.target.value)} />
+      <Select
+        label="Due day"
+        options={DAY_OPTIONS}
+        value={day}
+        onChange={(e) => setDay(e.target.value)}
+      />
       <div className="flex gap-2">
         <Button onClick={add}>Add rooms</Button>
         <Button variant="quiet" onClick={onCancel}>
@@ -122,7 +133,11 @@ export function RoomsStep() {
         <BulkAdd onAdd={bulkAdd} onCancel={() => setBulkOpen(false)} />
       ) : (
         <div className="flex flex-wrap gap-2">
-          <Button variant="secondary" onClick={() => append(emptyRoom())} disabled={fields.length >= 50}>
+          <Button
+            variant="secondary"
+            onClick={() => append(emptyRoom())}
+            disabled={fields.length >= 50}
+          >
             Add a room
           </Button>
           <Button variant="secondary" onClick={() => setBulkOpen(true)}>

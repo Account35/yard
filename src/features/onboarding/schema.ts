@@ -5,8 +5,7 @@ import type { Language, OnboardingRoomInput } from "@/types/domain";
 
 export const LANGUAGES = ["en", "zu", "xh", "st"] as const satisfies readonly Language[];
 
-const requiredText = (message: string) =>
-  z.string().refine((v) => v.trim().length > 0, message);
+const requiredText = (message: string) => z.string().refine((v) => v.trim().length > 0, message);
 
 export const roomSchema = z.object({
   name: requiredText("Enter a room name"),

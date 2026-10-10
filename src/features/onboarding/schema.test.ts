@@ -11,9 +11,7 @@ import {
 
 describe("roomSchema", () => {
   it("accepts a valid room", () => {
-    expect(roomSchema.safeParse({ name: "Room 1", rent: "1 200", dueDay: "1" }).success).toBe(
-      true,
-    );
+    expect(roomSchema.safeParse({ name: "Room 1", rent: "1 200", dueDay: "1" }).success).toBe(true);
   });
   it("rejects a blank name", () => {
     expect(roomSchema.safeParse({ name: "   ", rent: "1200", dueDay: "1" }).success).toBe(false);

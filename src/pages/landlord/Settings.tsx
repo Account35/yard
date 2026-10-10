@@ -30,7 +30,10 @@ export default function Settings() {
     <>
       <PageHeader title="Settings" />
       <ul className="divide-y divide-line border-y border-line">
-        <ListRow primary="Name" trailing={<span className="text-ink">{landlord.data?.name}</span>} />
+        <ListRow
+          primary="Name"
+          trailing={<span className="text-ink">{landlord.data?.name}</span>}
+        />
         <ListRow
           primary="Mobile number"
           trailing={<span className="text-ink">{parsed.ok ? parsed.phone.display : phone}</span>}

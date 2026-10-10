@@ -15,11 +15,7 @@ export function PropertyStep() {
         error={formState.errors.propertyName?.message}
         {...register("propertyName")}
       />
-      <Input
-        label="Address (optional)"
-        autoComplete="street-address"
-        {...register("address")}
-      />
+      <Input label="Address (optional)" autoComplete="street-address" {...register("address")} />
     </div>
   );
 }
