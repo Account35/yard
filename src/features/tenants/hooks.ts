@@ -5,7 +5,9 @@ import { queryKeys } from "@/lib/queryKeys";
 import {
   createTenant,
   getTenant,
+  getPublicTenantPage,
   listCurrentTenants,
+  listPreviousTenantsForRoom,
   listTenantsForRoom,
   moveOutTenant,
   regenerateTenantToken,
@@ -20,6 +22,14 @@ export function useTenantsForRoom(roomId: string) {
   return useQuery({
     queryKey: queryKeys.tenants.room(roomId),
     queryFn: () => listTenantsForRoom(roomId),
+    enabled: roomId.length > 0,
+  });
+}
+
+export function usePreviousTenantsForRoom(roomId: string) {
+  return useQuery({
+    queryKey: [...queryKeys.tenants.room(roomId), "previous"],
+    queryFn: () => listPreviousTenantsForRoom(roomId),
     enabled: roomId.length > 0,
   });
 }
@@ -79,5 +89,13 @@ export function useRegenerateTenantToken() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all });
     },
+  });
+}
+
+export function usePublicTenantPage(token: string) {
+  return useQuery({
+    queryKey: queryKeys.tenants.publicPage(token),
+    queryFn: () => getPublicTenantPage(token),
+    enabled: token.length > 0,
   });
 }

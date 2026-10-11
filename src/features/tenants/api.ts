@@ -12,6 +12,17 @@ export async function listCurrentTenants(): Promise<Tenant[]> {
   return (data ?? []) as Tenant[];
 }
 
+export async function listPreviousTenantsForRoom(roomId: string): Promise<Tenant[]> {
+  const { data, error } = await supabase
+    .from("tenants")
+    .select("*")
+    .eq("room_id", roomId)
+    .not("move_out_date", "is", null)
+    .order("move_out_date", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as Tenant[];
+}
+
 export async function listTenantsForRoom(roomId: string): Promise<Tenant[]> {
   const { data, error } = await supabase
     .from("tenants")
@@ -74,4 +85,20 @@ export async function regenerateTenantToken(tenantId: string): Promise<string> {
   const { data, error } = await supabase.rpc("regenerate_tenant_token", { p_tenant_id: tenantId });
   if (error) throw error;
   return String(data);
+}
+
+export interface PublicTenantPage {
+  tenant_name: string;
+  move_in_date: string;
+  move_out_date: string | null;
+  room_name: string;
+  property_name: string;
+  monthly_rent_cents: number;
+  due_day: number;
+}
+
+export async function getPublicTenantPage(token: string): Promise<PublicTenantPage | null> {
+  const { data, error } = await supabase.rpc("get_tenant_page", { p_access_token: token });
+  if (error) throw error;
+  return data?.[0] ?? null;
 }

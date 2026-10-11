@@ -7,6 +7,12 @@ import type { Language } from "@/types/domain";
 
 export const TENANT_LANGUAGES = ["en", "zu", "xh", "st"] as const satisfies readonly Language[];
 
+function isValidISODate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+
 const requiredText = (message: string) =>
   z
     .string()
@@ -33,10 +39,7 @@ export const tenantSchema = z.object({
       }
     }),
   roomId: requiredText("Choose a room"),
-  moveInDate: z
-    .string()
-    .trim()
-    .refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), "Choose a move-in date"),
+  moveInDate: z.string().trim().refine(isValidISODate, "Choose a valid move-in date"),
   deposit: z
     .string()
     .default("0")

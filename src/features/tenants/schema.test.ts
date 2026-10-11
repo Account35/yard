@@ -43,4 +43,16 @@ describe("tenantSchema", () => {
     const date = todayInSA();
     expect(/^\d{4}-\d{2}-\d{2}$/.test(date)).toBe(true);
   });
+
+  it("rejects impossible calendar dates", () => {
+    const result = tenantSchema.safeParse({
+      name: "Ava",
+      phone: "082 123 4567",
+      roomId: "room-1",
+      moveInDate: "2026-02-30",
+      deposit: "0",
+      language: "en",
+    });
+    expect(result.success).toBe(false);
+  });
 });

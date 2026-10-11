@@ -5,6 +5,7 @@ import { queryKeys } from "@/lib/queryKeys";
 import {
   createRoom,
   getProperty,
+  getRoom,
   listActiveRooms,
   listInactiveRooms,
   setRoomActive,
@@ -16,7 +17,15 @@ export function useActiveRooms() {
 }
 
 export function useInactiveRooms() {
-  return useQuery({ queryKey: ["rooms", "inactive"], queryFn: listInactiveRooms });
+  return useQuery({ queryKey: queryKeys.rooms.inactive, queryFn: listInactiveRooms });
+}
+
+export function useRoom(roomId: string) {
+  return useQuery({
+    queryKey: queryKeys.rooms.room(roomId),
+    queryFn: () => getRoom(roomId),
+    enabled: roomId.length > 0,
+  });
 }
 
 export function useProperty() {
@@ -36,13 +45,8 @@ export function useCreateRoom() {
 export function useUpdateRoom() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      roomId,
-      input,
-    }: {
-      roomId: string;
-      input: Partial<Parameters<typeof updateRoom>[1]>;
-    }) => updateRoom(roomId, input),
+    mutationFn: ({ roomId, input }: { roomId: string; input: Parameters<typeof updateRoom>[1] }) =>
+      updateRoom(roomId, input),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.rooms.all });
     },

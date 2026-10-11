@@ -24,6 +24,12 @@ export async function listInactiveRooms(): Promise<Room[]> {
   return data ?? [];
 }
 
+export async function getRoom(roomId: string): Promise<Room | null> {
+  const { data, error } = await supabase.from("rooms").select("*").eq("id", roomId).maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
 export async function getProperty(): Promise<Property | null> {
   const { data, error } = await supabase
     .from("properties")
@@ -47,7 +53,10 @@ export async function createRoom(input: {
   return data as Room;
 }
 
-export async function updateRoom(roomId: string, input: Partial<Room>): Promise<Room> {
+export async function updateRoom(
+  roomId: string,
+  input: Pick<Room, "name" | "monthly_rent_cents" | "due_day">,
+): Promise<Room> {
   const { data, error } = await supabase
     .from("rooms")
     .update(input)

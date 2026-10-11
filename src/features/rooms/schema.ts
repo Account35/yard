@@ -1,3 +1,7 @@
+import { z } from "zod";
+
+import { toCents } from "@/lib/money";
+
 export function naturalRoomSort<T extends { name: string }>(rooms: T[]): T[] {
   return [...rooms].sort((a, b) => compareRoomNames(a.name, b.name));
 }
@@ -37,4 +41,39 @@ export function hasDuplicateRoomName(names: string[]): boolean {
     normalised.add(key);
   }
   return false;
+}
+
+export const roomFormSchema = z.object({
+  name: z.string().trim().min(1, "Enter a room name"),
+  rent: z.string().superRefine((value, ctx) => {
+    const parsed = toCents(value);
+    if (!parsed.ok) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: parsed.error });
+    } else if (parsed.cents <= 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Rent must be more than R0" });
+    }
+  }),
+  dueDay: z
+    .string()
+    .refine(
+      (value) => /^\d{1,2}$/.test(value) && Number(value) >= 1 && Number(value) <= 28,
+      "Choose a day from 1 to 28",
+    ),
+});
+
+export type RoomFormValues = z.input<typeof roomFormSchema>;
+
+export function emptyRoomForm(): RoomFormValues {
+  return { name: "", rent: "", dueDay: "1" };
+}
+
+export function roomFormPayload(values: RoomFormValues) {
+  const parsed = roomFormSchema.parse(values);
+  const rent = toCents(parsed.rent);
+  if (!rent.ok) throw new Error(rent.error);
+  return {
+    name: parsed.name,
+    monthly_rent_cents: rent.cents,
+    due_day: Number(parsed.dueDay),
+  };
 }

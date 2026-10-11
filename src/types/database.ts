@@ -170,6 +170,18 @@ export type Database = {
       };
       owns_property: { Args: { p_property_id: string }; Returns: boolean };
       owns_room: { Args: { p_room_id: string }; Returns: boolean };
+      get_tenant_page: {
+        Args: { p_access_token: string };
+        Returns: {
+          tenant_name: string;
+          move_in_date: string;
+          move_out_date: string | null;
+          room_name: string;
+          property_name: string;
+          monthly_rent_cents: number;
+          due_day: number;
+        }[];
+      };
       regenerate_tenant_token: { Args: { p_tenant_id: string }; Returns: string };
     };
     Enums: Record<never, never>;

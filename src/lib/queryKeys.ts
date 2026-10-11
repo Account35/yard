@@ -13,6 +13,7 @@ export const queryKeys = {
   rooms: {
     all: ["rooms"] as const,
     active: ["rooms", "active"] as const,
+    inactive: ["rooms", "inactive"] as const,
     property: ["rooms", "property"] as const,
     room: (roomId: string) => ["rooms", roomId] as const,
   },
@@ -21,5 +22,6 @@ export const queryKeys = {
     current: ["tenants", "current"] as const,
     room: (roomId: string) => ["tenants", "room", roomId] as const,
     detail: (tenantId: string) => ["tenants", tenantId] as const,
+    publicPage: (token: string) => ["tenant-page", token] as const,
   },
 } as const;
