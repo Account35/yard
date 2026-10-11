@@ -13,5 +13,13 @@ export const queryKeys = {
   rooms: {
     all: ["rooms"] as const,
     active: ["rooms", "active"] as const,
+    property: ["rooms", "property"] as const,
+    room: (roomId: string) => ["rooms", roomId] as const,
+  },
+  tenants: {
+    all: ["tenants"] as const,
+    current: ["tenants", "current"] as const,
+    room: (roomId: string) => ["tenants", "room", roomId] as const,
+    detail: (tenantId: string) => ["tenants", tenantId] as const,
   },
 } as const;

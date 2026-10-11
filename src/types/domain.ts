@@ -21,6 +21,12 @@ export type Landlord = Omit<Tables["landlords"]["Row"], "language" | "reminder_t
 };
 export type Property = Tables["properties"]["Row"];
 export type Room = Tables["rooms"]["Row"];
+export type Tenant = Omit<Tables["tenants"]["Row"], "language"> & {
+  language: Language;
+};
+export type RoomWithTenant = Room & {
+  currentTenant: Pick<Tenant, "id" | "name" | "phone"> | null;
+};
 
 export type OnboardingRoomInput = {
   name: string;

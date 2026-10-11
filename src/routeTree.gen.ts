@@ -19,7 +19,11 @@ import { Route as LandlordMoneyRouteImport } from './routes/_landlord.money'
 import { Route as LandlordRoomsRouteImport } from './routes/_landlord.rooms'
 import { Route as LandlordSettingsRouteImport } from './routes/_landlord.settings'
 import { Route as DevKitRouteImport } from './routes/dev.kit'
+import { Route as LandlordRoomsRoomIdRouteImport } from './routes/_landlord.rooms.$roomId'
+import { Route as LandlordTenantsTenantIdRouteImport } from './routes/_landlord.tenants.$tenantId'
+import { Route as LandlordTenantsNewRouteImport } from './routes/_landlord.tenants.new'
 import { Route as TenantTTokenRouteImport } from './routes/_tenant.t.$token'
+import { Route as LandlordTenantsTenantIdEditRouteImport } from './routes/_landlord.tenants.$tenantId.edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -69,11 +73,32 @@ const DevKitRoute = DevKitRouteImport.update({
   path: '/dev/kit',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LandlordRoomsRoomIdRoute = LandlordRoomsRoomIdRouteImport.update({
+  id: '/$roomId',
+  path: '/$roomId',
+  getParentRoute: () => LandlordRoomsRoute,
+} as any)
+const LandlordTenantsTenantIdRoute = LandlordTenantsTenantIdRouteImport.update({
+  id: '/tenants/$tenantId',
+  path: '/tenants/$tenantId',
+  getParentRoute: () => LandlordRoute,
+} as any)
+const LandlordTenantsNewRoute = LandlordTenantsNewRouteImport.update({
+  id: '/tenants/new',
+  path: '/tenants/new',
+  getParentRoute: () => LandlordRoute,
+} as any)
 const TenantTTokenRoute = TenantTTokenRouteImport.update({
   id: '/t/$token',
   path: '/t/$token',
   getParentRoute: () => TenantRoute,
 } as any)
+const LandlordTenantsTenantIdEditRoute =
+  LandlordTenantsTenantIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => LandlordTenantsTenantIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -81,10 +106,14 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/home': typeof LandlordHomeRoute
   '/money': typeof LandlordMoneyRoute
-  '/rooms': typeof LandlordRoomsRoute
+  '/rooms': typeof LandlordRoomsRouteWithChildren
   '/settings': typeof LandlordSettingsRoute
   '/dev/kit': typeof DevKitRoute
+  '/rooms/$roomId': typeof LandlordRoomsRoomIdRoute
+  '/tenants/$tenantId': typeof LandlordTenantsTenantIdRouteWithChildren
+  '/tenants/new': typeof LandlordTenantsNewRoute
   '/t/$token': typeof TenantTTokenRoute
+  '/tenants/$tenantId/edit': typeof LandlordTenantsTenantIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -92,10 +121,14 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/home': typeof LandlordHomeRoute
   '/money': typeof LandlordMoneyRoute
-  '/rooms': typeof LandlordRoomsRoute
+  '/rooms': typeof LandlordRoomsRouteWithChildren
   '/settings': typeof LandlordSettingsRoute
   '/dev/kit': typeof DevKitRoute
+  '/rooms/$roomId': typeof LandlordRoomsRoomIdRoute
+  '/tenants/$tenantId': typeof LandlordTenantsTenantIdRouteWithChildren
+  '/tenants/new': typeof LandlordTenantsNewRoute
   '/t/$token': typeof TenantTTokenRoute
+  '/tenants/$tenantId/edit': typeof LandlordTenantsTenantIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -106,10 +139,14 @@ export interface FileRoutesById {
   '/sign-in': typeof SignInRoute
   '/_landlord/home': typeof LandlordHomeRoute
   '/_landlord/money': typeof LandlordMoneyRoute
-  '/_landlord/rooms': typeof LandlordRoomsRoute
+  '/_landlord/rooms': typeof LandlordRoomsRouteWithChildren
   '/_landlord/settings': typeof LandlordSettingsRoute
   '/dev/kit': typeof DevKitRoute
+  '/_landlord/rooms/$roomId': typeof LandlordRoomsRoomIdRoute
+  '/_landlord/tenants/$tenantId': typeof LandlordTenantsTenantIdRouteWithChildren
+  '/_landlord/tenants/new': typeof LandlordTenantsNewRoute
   '/_tenant/t/$token': typeof TenantTTokenRoute
+  '/_landlord/tenants/$tenantId/edit': typeof LandlordTenantsTenantIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -122,7 +159,11 @@ export interface FileRouteTypes {
     | '/rooms'
     | '/settings'
     | '/dev/kit'
+    | '/rooms/$roomId'
+    | '/tenants/$tenantId'
+    | '/tenants/new'
     | '/t/$token'
+    | '/tenants/$tenantId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -133,7 +174,11 @@ export interface FileRouteTypes {
     | '/rooms'
     | '/settings'
     | '/dev/kit'
+    | '/rooms/$roomId'
+    | '/tenants/$tenantId'
+    | '/tenants/new'
     | '/t/$token'
+    | '/tenants/$tenantId/edit'
   id:
     | '__root__'
     | '/'
@@ -146,7 +191,11 @@ export interface FileRouteTypes {
     | '/_landlord/rooms'
     | '/_landlord/settings'
     | '/dev/kit'
+    | '/_landlord/rooms/$roomId'
+    | '/_landlord/tenants/$tenantId'
+    | '/_landlord/tenants/new'
     | '/_tenant/t/$token'
+    | '/_landlord/tenants/$tenantId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -230,6 +279,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevKitRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_landlord/rooms/$roomId': {
+      id: '/_landlord/rooms/$roomId'
+      path: '/$roomId'
+      fullPath: '/rooms/$roomId'
+      preLoaderRoute: typeof LandlordRoomsRoomIdRouteImport
+      parentRoute: typeof LandlordRoomsRoute
+    }
+    '/_landlord/tenants/$tenantId': {
+      id: '/_landlord/tenants/$tenantId'
+      path: '/tenants/$tenantId'
+      fullPath: '/tenants/$tenantId'
+      preLoaderRoute: typeof LandlordTenantsTenantIdRouteImport
+      parentRoute: typeof LandlordRoute
+    }
+    '/_landlord/tenants/new': {
+      id: '/_landlord/tenants/new'
+      path: '/tenants/new'
+      fullPath: '/tenants/new'
+      preLoaderRoute: typeof LandlordTenantsNewRouteImport
+      parentRoute: typeof LandlordRoute
+    }
     '/_tenant/t/$token': {
       id: '/_tenant/t/$token'
       path: '/t/$token'
@@ -237,21 +307,58 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TenantTTokenRouteImport
       parentRoute: typeof TenantRoute
     }
+    '/_landlord/tenants/$tenantId/edit': {
+      id: '/_landlord/tenants/$tenantId/edit'
+      path: '/edit'
+      fullPath: '/tenants/$tenantId/edit'
+      preLoaderRoute: typeof LandlordTenantsTenantIdEditRouteImport
+      parentRoute: typeof LandlordTenantsTenantIdRoute
+    }
   }
 }
+
+interface LandlordRoomsRouteChildren {
+  LandlordRoomsRoomIdRoute: typeof LandlordRoomsRoomIdRoute
+}
+
+const LandlordRoomsRouteChildren: LandlordRoomsRouteChildren = {
+  LandlordRoomsRoomIdRoute: LandlordRoomsRoomIdRoute,
+}
+
+const LandlordRoomsRouteWithChildren = LandlordRoomsRoute._addFileChildren(
+  LandlordRoomsRouteChildren,
+)
+
+interface LandlordTenantsTenantIdRouteChildren {
+  LandlordTenantsTenantIdEditRoute: typeof LandlordTenantsTenantIdEditRoute
+}
+
+const LandlordTenantsTenantIdRouteChildren: LandlordTenantsTenantIdRouteChildren =
+  {
+    LandlordTenantsTenantIdEditRoute: LandlordTenantsTenantIdEditRoute,
+  }
+
+const LandlordTenantsTenantIdRouteWithChildren =
+  LandlordTenantsTenantIdRoute._addFileChildren(
+    LandlordTenantsTenantIdRouteChildren,
+  )
 
 interface LandlordRouteChildren {
   LandlordHomeRoute: typeof LandlordHomeRoute
   LandlordMoneyRoute: typeof LandlordMoneyRoute
-  LandlordRoomsRoute: typeof LandlordRoomsRoute
+  LandlordRoomsRoute: typeof LandlordRoomsRouteWithChildren
   LandlordSettingsRoute: typeof LandlordSettingsRoute
+  LandlordTenantsTenantIdRoute: typeof LandlordTenantsTenantIdRouteWithChildren
+  LandlordTenantsNewRoute: typeof LandlordTenantsNewRoute
 }
 
 const LandlordRouteChildren: LandlordRouteChildren = {
   LandlordHomeRoute: LandlordHomeRoute,
   LandlordMoneyRoute: LandlordMoneyRoute,
-  LandlordRoomsRoute: LandlordRoomsRoute,
+  LandlordRoomsRoute: LandlordRoomsRouteWithChildren,
   LandlordSettingsRoute: LandlordSettingsRoute,
+  LandlordTenantsTenantIdRoute: LandlordTenantsTenantIdRouteWithChildren,
+  LandlordTenantsNewRoute: LandlordTenantsNewRoute,
 }
 
 const LandlordRouteWithChildren = LandlordRoute._addFileChildren(

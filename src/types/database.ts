@@ -1,4 +1,4 @@
-// Hand-written to match supabase/migrations/0001_core_tables.sql.
+// Hand-written to match the Supabase migrations in this repo.
 // Regenerate with `npm run types:gen` once the migration is applied.
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
@@ -108,6 +108,53 @@ export type Database = {
           },
         ];
       };
+      tenants: {
+        Row: {
+          id: string;
+          room_id: string;
+          name: string;
+          phone: string;
+          language: string;
+          move_in_date: string;
+          deposit_cents: number;
+          move_out_date: string | null;
+          access_token: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          room_id: string;
+          name: string;
+          phone: string;
+          language?: string;
+          move_in_date: string;
+          deposit_cents?: number;
+          move_out_date?: string | null;
+          access_token: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          room_id?: string;
+          name?: string;
+          phone?: string;
+          language?: string;
+          move_in_date?: string;
+          deposit_cents?: number;
+          move_out_date?: string | null;
+          access_token?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "tenants_room_id_fkey";
+            columns: ["room_id"];
+            isOneToOne: false;
+            referencedRelation: "rooms";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<never, never>;
     Functions: {
@@ -123,6 +170,7 @@ export type Database = {
       };
       owns_property: { Args: { p_property_id: string }; Returns: boolean };
       owns_room: { Args: { p_room_id: string }; Returns: boolean };
+      regenerate_tenant_token: { Args: { p_tenant_id: string }; Returns: string };
     };
     Enums: Record<never, never>;
     CompositeTypes: Record<never, never>;
