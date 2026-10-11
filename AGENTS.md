@@ -16,3 +16,4 @@
 - The app builds in TanStack Start spa mode; Netlify serves dist/client statically with a rewrite to /_shell.html, so there are no server functions in production.
 - Supabase is the user's own project, reached only from the browser via src/lib/supabase.ts with the anon key; never use a service-role key.
 - The service worker is registered only from src/lib/pwa.ts and never caches Supabase or auth requests.
+- Route guards are components (RequireAuth, RequireOnboarded) in the _landlord layout, redirecting from effects; auth lives in React context, not router beforeLoad, because the session is browser-only in spa mode.
