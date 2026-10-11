@@ -24,6 +24,8 @@ import { Route as LandlordTenantsTenantIdRouteImport } from './routes/_landlord.
 import { Route as LandlordTenantsNewRouteImport } from './routes/_landlord.tenants.new'
 import { Route as TenantTTokenRouteImport } from './routes/_tenant.t.$token'
 import { Route as LandlordTenantsTenantIdEditRouteImport } from './routes/_landlord.tenants.$tenantId.edit'
+import { Route as LandlordTenantsTenantIdPaymentsPaymentIdRouteImport } from './routes/_landlord.tenants.$tenantId.payments.$paymentId'
+import { Route as LandlordTenantsTenantIdPaymentsNewRouteImport } from './routes/_landlord.tenants.$tenantId.payments.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -99,6 +101,18 @@ const LandlordTenantsTenantIdEditRoute =
     path: '/edit',
     getParentRoute: () => LandlordTenantsTenantIdRoute,
   } as any)
+const LandlordTenantsTenantIdPaymentsPaymentIdRoute =
+  LandlordTenantsTenantIdPaymentsPaymentIdRouteImport.update({
+    id: '/payments/$paymentId',
+    path: '/payments/$paymentId',
+    getParentRoute: () => LandlordTenantsTenantIdRoute,
+  } as any)
+const LandlordTenantsTenantIdPaymentsNewRoute =
+  LandlordTenantsTenantIdPaymentsNewRouteImport.update({
+    id: '/payments/new',
+    path: '/payments/new',
+    getParentRoute: () => LandlordTenantsTenantIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -114,6 +128,8 @@ export interface FileRoutesByFullPath {
   '/tenants/new': typeof LandlordTenantsNewRoute
   '/t/$token': typeof TenantTTokenRoute
   '/tenants/$tenantId/edit': typeof LandlordTenantsTenantIdEditRoute
+  '/tenants/$tenantId/payments/$paymentId': typeof LandlordTenantsTenantIdPaymentsPaymentIdRoute
+  '/tenants/$tenantId/payments/new': typeof LandlordTenantsTenantIdPaymentsNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -129,6 +145,8 @@ export interface FileRoutesByTo {
   '/tenants/new': typeof LandlordTenantsNewRoute
   '/t/$token': typeof TenantTTokenRoute
   '/tenants/$tenantId/edit': typeof LandlordTenantsTenantIdEditRoute
+  '/tenants/$tenantId/payments/$paymentId': typeof LandlordTenantsTenantIdPaymentsPaymentIdRoute
+  '/tenants/$tenantId/payments/new': typeof LandlordTenantsTenantIdPaymentsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -147,6 +165,8 @@ export interface FileRoutesById {
   '/_landlord/tenants/new': typeof LandlordTenantsNewRoute
   '/_tenant/t/$token': typeof TenantTTokenRoute
   '/_landlord/tenants/$tenantId/edit': typeof LandlordTenantsTenantIdEditRoute
+  '/_landlord/tenants/$tenantId/payments/$paymentId': typeof LandlordTenantsTenantIdPaymentsPaymentIdRoute
+  '/_landlord/tenants/$tenantId/payments/new': typeof LandlordTenantsTenantIdPaymentsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -164,6 +184,8 @@ export interface FileRouteTypes {
     | '/tenants/new'
     | '/t/$token'
     | '/tenants/$tenantId/edit'
+    | '/tenants/$tenantId/payments/$paymentId'
+    | '/tenants/$tenantId/payments/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -179,6 +201,8 @@ export interface FileRouteTypes {
     | '/tenants/new'
     | '/t/$token'
     | '/tenants/$tenantId/edit'
+    | '/tenants/$tenantId/payments/$paymentId'
+    | '/tenants/$tenantId/payments/new'
   id:
     | '__root__'
     | '/'
@@ -196,6 +220,8 @@ export interface FileRouteTypes {
     | '/_landlord/tenants/new'
     | '/_tenant/t/$token'
     | '/_landlord/tenants/$tenantId/edit'
+    | '/_landlord/tenants/$tenantId/payments/$paymentId'
+    | '/_landlord/tenants/$tenantId/payments/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -314,6 +340,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LandlordTenantsTenantIdEditRouteImport
       parentRoute: typeof LandlordTenantsTenantIdRoute
     }
+    '/_landlord/tenants/$tenantId/payments/$paymentId': {
+      id: '/_landlord/tenants/$tenantId/payments/$paymentId'
+      path: '/payments/$paymentId'
+      fullPath: '/tenants/$tenantId/payments/$paymentId'
+      preLoaderRoute: typeof LandlordTenantsTenantIdPaymentsPaymentIdRouteImport
+      parentRoute: typeof LandlordTenantsTenantIdRoute
+    }
+    '/_landlord/tenants/$tenantId/payments/new': {
+      id: '/_landlord/tenants/$tenantId/payments/new'
+      path: '/payments/new'
+      fullPath: '/tenants/$tenantId/payments/new'
+      preLoaderRoute: typeof LandlordTenantsTenantIdPaymentsNewRouteImport
+      parentRoute: typeof LandlordTenantsTenantIdRoute
+    }
   }
 }
 
@@ -331,11 +371,17 @@ const LandlordRoomsRouteWithChildren = LandlordRoomsRoute._addFileChildren(
 
 interface LandlordTenantsTenantIdRouteChildren {
   LandlordTenantsTenantIdEditRoute: typeof LandlordTenantsTenantIdEditRoute
+  LandlordTenantsTenantIdPaymentsPaymentIdRoute: typeof LandlordTenantsTenantIdPaymentsPaymentIdRoute
+  LandlordTenantsTenantIdPaymentsNewRoute: typeof LandlordTenantsTenantIdPaymentsNewRoute
 }
 
 const LandlordTenantsTenantIdRouteChildren: LandlordTenantsTenantIdRouteChildren =
   {
     LandlordTenantsTenantIdEditRoute: LandlordTenantsTenantIdEditRoute,
+    LandlordTenantsTenantIdPaymentsPaymentIdRoute:
+      LandlordTenantsTenantIdPaymentsPaymentIdRoute,
+    LandlordTenantsTenantIdPaymentsNewRoute:
+      LandlordTenantsTenantIdPaymentsNewRoute,
   }
 
 const LandlordTenantsTenantIdRouteWithChildren =

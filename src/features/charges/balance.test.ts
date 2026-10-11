@@ -50,6 +50,8 @@ function payment(values: Partial<Payment> = {}): Payment {
     receipt_number: null,
     created_by: "landlord",
     created_at: "2026-10-06T12:00:00.000Z",
+    voided_at: null,
+    void_reason: null,
     ...values,
   };
 }
@@ -109,7 +111,7 @@ describe("buildStatement", () => {
 
     expect(lines.map((line) => line.id)).toEqual(["nov", "paid-oct", "oct"]);
     expect(lines.map((line) => line.runningBalanceCents)).toEqual([180_000, 80_000, 100_000]);
-    expect(lines[1]?.description).toBe("Payment, cash");
+    expect(lines[1]?.description).toBe("Payment, Cash");
     expect(lines[2]?.description).toBe("Rent, October 2026");
   });
 
@@ -128,6 +130,34 @@ describe("buildStatement", () => {
       runningBalanceCents: 100_000,
     });
     expect(lines[1]).toMatchObject({ id: "charge-1", runningBalanceCents: 100_000 });
+  });
+
+  it("shows a voided payment as a dated reversal and hides a rejected claim", () => {
+    const lines = buildStatement(
+      [charge({ amount_cents: 100_000 })],
+      [
+        payment({
+          id: "voided",
+          amount_cents: 30_000,
+          status: "declined",
+          receipt_number: "YD-00001",
+          voided_at: "2026-10-08T22:30:00.000Z",
+          void_reason: "Entered twice",
+        }),
+        payment({ id: "rejected-claim", status: "declined" }),
+      ],
+    );
+
+    expect(lines).toHaveLength(2);
+    expect(lines[0]).toMatchObject({
+      id: "voided",
+      date: "2026-10-09",
+      description: "Voided payment · Receipt YD-00001",
+      note: "Entered twice",
+      amountCents: 30_000,
+      runningBalanceCents: 130_000,
+      isVoided: true,
+    });
   });
 
   it("returns no lines when there are no charges or payments", () => {

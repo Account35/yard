@@ -35,6 +35,8 @@ export const queryKeys = {
   payments: {
     all: ["payments"] as const,
     tenant: (tenantId: string) => ["payments", "tenant", tenantId] as const,
+    payment: (paymentId: string) => ["payments", "detail", paymentId] as const,
     month: (period: string) => ["payments", "month", period] as const,
+    proofUrl: (path: string) => ["payments", "proof-url", path] as const,
   },
 } as const;

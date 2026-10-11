@@ -14,4 +14,15 @@ describe("App routing", () => {
 
     expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
   });
+
+  it("matches payment recording and detail pages inside the landlord area", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+
+    expect(router.matchRoutes("/tenants/tenant-1/payments/new").at(-1)?.routeId).toBe(
+      "/_landlord/tenants/$tenantId/payments/new",
+    );
+    expect(router.matchRoutes("/tenants/tenant-1/payments/payment-1").at(-1)?.routeId).toBe(
+      "/_landlord/tenants/$tenantId/payments/$paymentId",
+    );
+  });
 });

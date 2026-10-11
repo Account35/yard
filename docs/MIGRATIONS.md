@@ -11,6 +11,10 @@ Migration version `0003` is already applied. The next migration must use version
 do not reuse `0003`. Apply each new migration to Supabase before deploying the matching
 app code.
 
+Phase 3 uses `0004_charges_and_balances.sql`. Phase 4 adds
+`0005_payments_and_receipts.sql`; apply it manually in the Supabase SQL editor, then
+regenerate the database types from the updated schema before deploying Phase 4.
+
 - Name files with a four-digit number and a short name, for example `0001_core_tables.sql`.
 - Never edit an old migration. Every change is a new numbered file.
 - Changes are additive only: new tables, new nullable columns, or columns with a safe default.

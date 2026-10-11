@@ -11,6 +11,13 @@ export type PaymentMethod = "cash" | "eft" | "ewallet" | "other";
 export type PaymentRecordStatus = "confirmed" | "pending_confirmation" | "declined";
 export type PaymentCreatedBy = "landlord" | "tenant";
 
+export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+  cash: "Cash",
+  eft: "EFT",
+  ewallet: "eWallet",
+  other: "Other",
+};
+
 export type Language = "en" | "zu" | "xh" | "st";
 export type ReminderTone = "friendly" | "firm";
 
@@ -38,6 +45,20 @@ export type Payment = Omit<Tables["payments"]["Row"], "method" | "status" | "cre
   status: PaymentRecordStatus;
   created_by: PaymentCreatedBy;
 };
+export type ReceiptData = {
+  receiptNumber: string;
+  issuedOn: string;
+  landlordName: string;
+  landlordPhone: string;
+  propertyName: string;
+  propertyAddress: string | null;
+  tenantName: string;
+  roomName: string;
+  amountCents: number;
+  paidOn: string;
+  method: PaymentMethod;
+  balanceAfterCents: number;
+};
 export type TenantBalance = {
   tenantId: string;
   roomId: string;
@@ -57,6 +78,7 @@ export type StatementLine = {
   amountCents: number;
   runningBalanceCents: number;
   isPending: boolean;
+  isVoided: boolean;
 };
 export type RoomWithTenant = Room & {
   currentTenant: Pick<Tenant, "id" | "name" | "phone"> | null;

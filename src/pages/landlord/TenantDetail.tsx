@@ -153,6 +153,15 @@ export default function TenantDetail() {
             )}
             {!tenant.move_out_date && (
               <>
+                <Button
+                  onClick={() =>
+                    void navigate({
+                      to: paths.recordPayment.replace("$tenantId", tenant.id),
+                    })
+                  }
+                >
+                  Record payment
+                </Button>
                 <Button variant="secondary" onClick={() => void copyLink()}>
                   Copy tenant link
                 </Button>

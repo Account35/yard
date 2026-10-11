@@ -70,6 +70,29 @@ export type Database = {
           },
         ];
       };
+      receipt_counters: {
+        Row: {
+          landlord_id: string;
+          last_number: number;
+        };
+        Insert: {
+          landlord_id: string;
+          last_number?: number;
+        };
+        Update: {
+          landlord_id?: string;
+          last_number?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "receipt_counters_landlord_id_fkey";
+            columns: ["landlord_id"];
+            isOneToOne: true;
+            referencedRelation: "landlords";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       rooms: {
         Row: {
           id: string;
@@ -208,6 +231,8 @@ export type Database = {
           receipt_number: string | null;
           created_by: string;
           created_at: string;
+          voided_at: string | null;
+          void_reason: string | null;
         };
         Insert: {
           id?: string;
@@ -220,6 +245,8 @@ export type Database = {
           receipt_number?: string | null;
           created_by?: string;
           created_at?: string;
+          voided_at?: string | null;
+          void_reason?: string | null;
         };
         Update: {
           id?: string;
@@ -232,6 +259,8 @@ export type Database = {
           receipt_number?: string | null;
           created_by?: string;
           created_at?: string;
+          voided_at?: string | null;
+          void_reason?: string | null;
         };
         Relationships: [
           {
@@ -288,6 +317,10 @@ export type Database = {
       today_sa: { Args: Record<PropertyKey, never>; Returns: string };
       owns_tenant: { Args: { p_tenant_id: string }; Returns: boolean };
       generate_rent_charges: { Args: Record<PropertyKey, never>; Returns: number };
+      void_payment: {
+        Args: { p_payment_id: string; p_reason: string };
+        Returns: undefined;
+      };
     };
     Enums: Record<never, never>;
     CompositeTypes: Record<never, never>;

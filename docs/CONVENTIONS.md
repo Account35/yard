@@ -166,3 +166,18 @@ Differences from the original Phase 0 brief, required by the framework:
   payment entry and reconciliation are out of scope for Phase 3.
 - Dashboard summaries use the current South African month and include collected,
   expected, and outstanding amounts. Tenant status groups link to tenant details.
+
+## Payments and receipts (Phase 4)
+
+- Landlord-recorded payments are confirmed and receive a sequential per-landlord
+  receipt number in the database. Confirmed payments are immutable; correcting one
+  means voiding it with a reason and recording a replacement.
+- Voided payments have `status = declined`, `voided_at`, and `void_reason`. A declined
+  payment without `voided_at` is a rejected tenant claim and is not shown in the
+  landlord statement.
+- Payment proof files are stored in the private `payment-proofs` bucket by storage
+  path, never as public URLs. Use short-lived signed URLs to display proofs.
+- Compress images on-device before upload; PDFs may be uploaded unchanged. Payment
+  dates cannot be later than `todayInSA()`.
+- Receipt PDFs are generated with jsPDF only after a download or share action. Keep
+  the receipt data type independent of database records for future tenant access.

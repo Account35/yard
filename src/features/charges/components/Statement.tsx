@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/Button";
 import { EditChargeSheet } from "@/features/charges/components/EditChargeSheet";
@@ -6,6 +7,7 @@ import { buildStatement } from "@/features/charges/balance";
 import { useUpdateCharge } from "@/features/charges/hooks";
 import { formatShortDate } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
+import { paths } from "@/router/paths";
 import type { Charge, Payment } from "@/types/domain";
 
 interface StatementProps {
@@ -33,14 +35,28 @@ export function Statement({ charges, payments, readOnly }: StatementProps) {
         {lines.map((line) => {
           const charge =
             line.kind === "charge" ? charges.find((item) => item.id === line.id) : null;
+          const payment =
+            line.kind === "payment" ? payments.find((item) => item.id === line.id) : null;
           return (
             <li key={line.id} className="py-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-body text-ink">{line.description}</p>
+                  {payment ? (
+                    <Link
+                      className="text-body text-ink underline"
+                      to={paths.paymentDetail
+                        .replace("$tenantId", payment.tenant_id)
+                        .replace("$paymentId", payment.id)}
+                    >
+                      {line.description}
+                    </Link>
+                  ) : (
+                    <p className="text-body text-ink">{line.description}</p>
+                  )}
                   <p className="text-secondary text-ink-muted">
                     {formatShortDate(line.date)}
                     {line.isPending ? " · Pending" : ""}
+                    {line.isVoided ? " · Voided" : ""}
                   </p>
                   {line.note && <p className="mt-1 text-secondary text-ink">{line.note}</p>}
                 </div>

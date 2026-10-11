@@ -1,5 +1,12 @@
 import { formatMonthLabel } from "@/lib/dates";
-import type { Charge, Payment, RentStatus, StatementLine, TenantBalance } from "@/types/domain";
+import {
+  PAYMENT_METHOD_LABELS,
+  type Charge,
+  type Payment,
+  type RentStatus,
+  type StatementLine,
+  type TenantBalance,
+} from "@/types/domain";
 
 export interface TenantStatusItem {
   tenantId: string;
@@ -36,15 +43,30 @@ export function daysLate(oldestUnpaidDueDate: string | null, today: string): num
   return Math.floor((now - due) / 86_400_000);
 }
 
+function dateInSouthAfrica(timestamp: string): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Africa/Johannesburg",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(timestamp));
+  const part = (type: string) => parts.find((item) => item.type === type)?.value ?? "";
+  return `${part("year")}-${part("month")}-${part("day")}`;
+}
+
 export function buildStatement(charges: Charge[], payments: Payment[]): StatementLine[] {
   const entries: Array<
     | { kind: "charge"; date: string; charge: Charge }
-    | { kind: "payment"; date: string; payment: Payment }
+    | { kind: "payment"; date: string; payment: Payment; isVoided: boolean }
   > = [
     ...charges.map((charge) => ({ kind: "charge" as const, date: charge.due_date, charge })),
-    ...payments
-      .filter((payment) => payment.status !== "declined")
-      .map((payment) => ({ kind: "payment" as const, date: payment.paid_on, payment })),
+    ...payments.flatMap((payment) => {
+      const voidedAt = payment.status === "declined" ? payment.voided_at : null;
+      const isVoided = voidedAt !== null;
+      if (payment.status === "declined" && !isVoided) return [];
+      const date = voidedAt ? dateInSouthAfrica(voidedAt) : payment.paid_on;
+      return [{ kind: "payment" as const, date, payment, isVoided }];
+    }),
   ];
   entries.sort((left, right) => {
     const dateOrder = left.date.localeCompare(right.date);
@@ -71,20 +93,27 @@ export function buildStatement(charges: Charge[], payments: Payment[]): Statemen
         amountCents: entry.charge.amount_cents,
         runningBalanceCents,
         isPending: false,
+        isVoided: false,
       };
     }
 
     const isPending = entry.payment.status === "pending_confirmation";
-    if (!isPending) runningBalanceCents -= entry.payment.amount_cents;
+    if (entry.isVoided) runningBalanceCents += entry.payment.amount_cents;
+    else if (!isPending) runningBalanceCents -= entry.payment.amount_cents;
+    const paymentMethod = PAYMENT_METHOD_LABELS[entry.payment.method];
+    const receipt = entry.payment.receipt_number ? `Receipt ${entry.payment.receipt_number}` : "";
     return {
       id: entry.payment.id,
       kind: "payment",
-      date: entry.payment.paid_on,
-      description: `Payment, ${entry.payment.method}`,
-      note: null,
-      amountCents: -entry.payment.amount_cents,
+      date: entry.date,
+      description: entry.isVoided
+        ? `Voided payment${receipt ? ` · ${receipt}` : ""}`
+        : `Payment, ${paymentMethod}${receipt ? ` · ${receipt}` : ""}`,
+      note: entry.payment.void_reason,
+      amountCents: entry.isVoided ? entry.payment.amount_cents : -entry.payment.amount_cents,
       runningBalanceCents,
       isPending,
+      isVoided: entry.isVoided,
     };
   });
 

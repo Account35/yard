@@ -10,6 +10,8 @@ export const paths = {
   tenantNew: "/tenants/new",
   tenantDetail: "/tenants/$tenantId",
   tenantEdit: "/tenants/$tenantId/edit",
+  recordPayment: "/tenants/$tenantId/payments/new",
+  paymentDetail: "/tenants/$tenantId/payments/$paymentId",
   tenant: "/t/$token",
   devKit: "/dev/kit",
   SIGN_IN: "/sign-in",
