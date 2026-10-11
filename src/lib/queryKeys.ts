@@ -24,4 +24,17 @@ export const queryKeys = {
     detail: (tenantId: string) => ["tenants", tenantId] as const,
     publicPage: (token: string) => ["tenant-page", token] as const,
   },
+  charges: {
+    all: ["charges"] as const,
+    month: (period: string) => ["charges", "month", period] as const,
+    tenant: (tenantId: string) => ["charges", "tenant", tenantId] as const,
+    statement: (tenantId: string) => ["statement", tenantId] as const,
+    balances: ["tenant-balances"] as const,
+    generation: (userId: string) => ["rent-charge-generation", userId] as const,
+  },
+  payments: {
+    all: ["payments"] as const,
+    tenant: (tenantId: string) => ["payments", "tenant", tenantId] as const,
+    month: (period: string) => ["payments", "month", period] as const,
+  },
 } as const;

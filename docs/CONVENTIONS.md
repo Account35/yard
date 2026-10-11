@@ -146,3 +146,23 @@ Differences from the original Phase 0 brief, required by the framework:
   `landlords.reminder_tone` is `friendly` or `firm`.
 - Rooms are never deleted (no delete policy); set `is_active = false` instead.
 - The onboarding draft lives in localStorage under `yard.onboarding.draft`.
+
+## Charges and payments (Phase 3)
+
+- Migration `0004_charges_and_balances.sql` adds landlord-owned `charges` and `payments`,
+  the `tenant_balances` view, and the `generate_rent_charges()` RPC. Migration `0003`
+  remains reserved for the public tenant page and must not be reused.
+- Money remains integer cents. Charge periods are `YYYY-MM`; due and paid dates are
+  `YYYY-MM-DD`. Rent generation must be safe to call repeatedly and is triggered when
+  the landlord area loads and after tenant changes.
+- Confirmed payments reduce tenant balances. Pending-confirmation payments appear in
+  statements but do not reduce balances; declined payments are excluded from balances
+  and statements.
+- Rent status is derived from the tenant balance: paid (zero or credit), late (positive
+  overdue amount), part paid (current-period payment with an amount still owed), or not
+  due. A status colour always appears with its text label.
+- Statements combine charges and payments in date order with a running balance.
+  Moved-out tenant statements are read-only. Charge edits update the amount and note;
+  payment entry and reconciliation are out of scope for Phase 3.
+- Dashboard summaries use the current South African month and include collected,
+  expected, and outstanding amounts. Tenant status groups link to tenant details.

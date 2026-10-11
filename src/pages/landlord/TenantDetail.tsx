@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "@tanstack/react-router";
-import type { ReactNode } from "react";
 
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
+import { BalanceBlock } from "@/features/charges/components/BalanceBlock";
+import { Statement } from "@/features/charges/components/Statement";
+import { daysLate, deriveStatus } from "@/features/charges/balance";
+import { useTenantBalances, useTenantCharges } from "@/features/charges/hooks";
+import { useTenantPayments } from "@/features/payments/hooks";
 import { useRoom } from "@/features/rooms/hooks";
 import { useMoveOutTenant, useRegenerateTenantToken, useTenant } from "@/features/tenants/hooks";
 import { formatShortDate, todayInSA } from "@/lib/dates";
@@ -19,6 +23,9 @@ export default function TenantDetail() {
   const tenantQuery = useTenant(tenantId);
   const tenant = tenantQuery.data ?? null;
   const roomQuery = useRoom(tenant?.room_id ?? "");
+  const balancesQuery = useTenantBalances();
+  const chargesQuery = useTenantCharges(tenantId);
+  const paymentsQuery = useTenantPayments(tenantId);
   const moveOut = useMoveOutTenant();
   const regenerate = useRegenerateTenantToken();
   const [copyMessage, setCopyMessage] = useState("");
@@ -28,6 +35,10 @@ export default function TenantDetail() {
   const phoneHref = tenant
     ? `tel:${phone?.ok ? phone.phone.e164 : tenant.phone.replace(/[^\d+]/g, "")}`
     : undefined;
+  const balance = (balancesQuery.data ?? []).find((item) => item.tenantId === tenant?.id);
+  const status = balance ? deriveStatus(balance) : "not_due";
+  const daysOverdue =
+    status === "late" && balance ? daysLate(balance.oldestUnpaidDueDate, todayInSA()) : 0;
 
   async function copyLink() {
     if (!tenant) return;
@@ -49,16 +60,24 @@ export default function TenantDetail() {
     try {
       const newToken = await regenerate.mutateAsync(tenant.id);
       setTokenOverride(newToken);
+      await navigator.clipboard.writeText(tenantLink(newToken));
+      setCopyMessage("Link regenerated and copied");
     } catch (error) {
       setActionError(error instanceof Error ? error.message : "The link could not be regenerated.");
     }
   }
 
   async function moveOutTenant() {
-    if (!tenant || !window.confirm(`Move ${tenant.name} out today?`)) return;
+    if (!tenant) return;
+    const balanceWarning =
+      balance && balance.balanceCents > 0
+        ? ` There is an outstanding balance of ${formatMoney(balance.balanceCents)}.`
+        : "";
+    if (!window.confirm(`Move ${tenant.name} out today?${balanceWarning}`)) return;
     setActionError("");
     try {
       await moveOut.mutateAsync({ tenantId: tenant.id, moveOutDate: todayInSA() });
+      await navigate({ to: paths.rooms });
     } catch (error) {
       setActionError(error instanceof Error ? error.message : "The tenant could not be moved out.");
     }
@@ -132,11 +151,11 @@ export default function TenantDetail() {
                 Call
               </a>
             )}
-            <Button variant="secondary" onClick={() => void copyLink()}>
-              Copy tenant link
-            </Button>
             {!tenant.move_out_date && (
               <>
+                <Button variant="secondary" onClick={() => void copyLink()}>
+                  Copy tenant link
+                </Button>
                 <Button
                   variant="secondary"
                   loading={regenerate.isPending}
@@ -164,6 +183,32 @@ export default function TenantDetail() {
               </>
             )}
           </div>
+
+          {balancesQuery.isPending || chargesQuery.isPending || paymentsQuery.isPending ? (
+            <p className="py-4 text-body text-ink-muted">Loading statement...</p>
+          ) : balancesQuery.isError || chargesQuery.isError || paymentsQuery.isError ? (
+            <p role="alert" className="py-4 text-body text-ink">
+              The tenant statement did not load. Check your connection and try again.
+            </p>
+          ) : (
+            <>
+              {balance && (
+                <BalanceBlock
+                  balanceCents={balance.balanceCents}
+                  status={status}
+                  daysLate={daysOverdue}
+                />
+              )}
+              <section className="space-y-3">
+                <h2 className="text-body font-semibold text-ink">Statement</h2>
+                <Statement
+                  charges={chargesQuery.data ?? []}
+                  payments={paymentsQuery.data ?? []}
+                  readOnly={tenant.move_out_date !== null}
+                />
+              </section>
+            </>
+          )}
         </div>
       )}
     </>

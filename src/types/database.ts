@@ -155,8 +155,110 @@ export type Database = {
           },
         ];
       };
+      charges: {
+        Row: {
+          id: string;
+          tenant_id: string;
+          type: string;
+          period: string;
+          amount_cents: number;
+          due_date: string;
+          note: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          tenant_id: string;
+          type: string;
+          period: string;
+          amount_cents: number;
+          due_date: string;
+          note?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          tenant_id?: string;
+          type?: string;
+          period?: string;
+          amount_cents?: number;
+          due_date?: string;
+          note?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "charges_tenant_id_fkey";
+            columns: ["tenant_id"];
+            isOneToOne: false;
+            referencedRelation: "tenants";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      payments: {
+        Row: {
+          id: string;
+          tenant_id: string;
+          amount_cents: number;
+          paid_on: string;
+          method: string;
+          proof_url: string | null;
+          status: string;
+          receipt_number: string | null;
+          created_by: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          tenant_id: string;
+          amount_cents: number;
+          paid_on: string;
+          method: string;
+          proof_url?: string | null;
+          status?: string;
+          receipt_number?: string | null;
+          created_by?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          tenant_id?: string;
+          amount_cents?: number;
+          paid_on?: string;
+          method?: string;
+          proof_url?: string | null;
+          status?: string;
+          receipt_number?: string | null;
+          created_by?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "payments_tenant_id_fkey";
+            columns: ["tenant_id"];
+            isOneToOne: false;
+            referencedRelation: "tenants";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
-    Views: Record<never, never>;
+    Views: {
+      tenant_balances: {
+        Row: {
+          tenant_id: string | null;
+          room_id: string | null;
+          charged_cents: number | null;
+          paid_cents: number | null;
+          balance_cents: number | null;
+          overdue_cents: number | null;
+          paid_this_month_cents: number | null;
+          oldest_unpaid_due_date: string | null;
+        };
+        Relationships: [];
+      };
+    };
     Functions: {
       complete_onboarding: {
         Args: {
@@ -183,6 +285,9 @@ export type Database = {
         }[];
       };
       regenerate_tenant_token: { Args: { p_tenant_id: string }; Returns: string };
+      today_sa: { Args: Record<PropertyKey, never>; Returns: string };
+      owns_tenant: { Args: { p_tenant_id: string }; Returns: boolean };
+      generate_rent_charges: { Args: Record<PropertyKey, never>; Returns: number };
     };
     Enums: Record<never, never>;
     CompositeTypes: Record<never, never>;

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { queryKeys } from "@/lib/queryKeys";
+import { generateChargesAfterTenantChange } from "@/features/charges/hooks";
 
 import {
   createTenant,
@@ -47,8 +48,11 @@ export function useCreateTenant() {
   return useMutation({
     mutationFn: createTenant,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all });
-      await queryClient.invalidateQueries({ queryKey: queryKeys.rooms.all });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.rooms.all }),
+      ]);
+      await generateChargesAfterTenantChange(queryClient);
     },
   });
 }
@@ -64,8 +68,11 @@ export function useUpdateTenant() {
       input: Partial<Parameters<typeof updateTenant>[1]>;
     }) => updateTenant(tenantId, input),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all });
-      await queryClient.invalidateQueries({ queryKey: queryKeys.rooms.all });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.rooms.all }),
+      ]);
+      await generateChargesAfterTenantChange(queryClient);
     },
   });
 }
@@ -76,8 +83,11 @@ export function useMoveOutTenant() {
     mutationFn: ({ tenantId, moveOutDate }: { tenantId: string; moveOutDate: string }) =>
       moveOutTenant(tenantId, moveOutDate),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all });
-      await queryClient.invalidateQueries({ queryKey: queryKeys.rooms.all });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.rooms.all }),
+      ]);
+      await generateChargesAfterTenantChange(queryClient);
     },
   });
 }
