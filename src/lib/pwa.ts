@@ -23,7 +23,40 @@ async function unregisterAppWorkers(): Promise<void> {
   );
 }
 
+const RELOAD_KEY = "yard.chunk-reload-at";
+
+function isStaleChunkError(message: string): boolean {
+  return /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module/i.test(
+    message,
+  );
+}
+
+/** After a new deploy, old pages request page files that no longer exist. Reload once (at most every 10s) to pick up the new version. */
+function reloadForStaleChunk(): void {
+  const last = Number(sessionStorage.getItem(RELOAD_KEY) ?? "0");
+  if (Date.now() - last < 10_000) return;
+  sessionStorage.setItem(RELOAD_KEY, String(Date.now()));
+  window.location.reload();
+}
+
+export function installStaleChunkRecovery(): void {
+  if (typeof window === "undefined") return;
+  window.addEventListener("vite:preloadError", (event) => {
+    event.preventDefault();
+    reloadForStaleChunk();
+  });
+  window.addEventListener("unhandledrejection", (event) => {
+    const reason: unknown = event.reason;
+    const message = reason instanceof Error ? reason.message : String(reason);
+    if (isStaleChunkError(message)) reloadForStaleChunk();
+  });
+  window.addEventListener("error", (event) => {
+    if (isStaleChunkError(event.message ?? "")) reloadForStaleChunk();
+  });
+}
+
 export function registerServiceWorker(): void {
+  installStaleChunkRecovery();
   if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
   if (isRefusedContext()) {
     void unregisterAppWorkers();
