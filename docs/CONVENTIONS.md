@@ -198,3 +198,29 @@ Differences from the original Phase 0 brief, required by the framework:
 - Store landlord message language and reminder wording in the existing preference
   fields. New tenants default to the landlord's saved language; tenants can retain their
   own message language.
+
+## Tenant payment notices (Phase 6)
+
+- Apply `0008_tenant_payments.sql` manually after `0007_message_log.sql`. It adds only
+  `payments.decline_reason`, indexes and functions; it creates no new table.
+- Tenants never read or write database tables directly. Public reads use token-scoped
+  `SECURITY DEFINER` functions that select only the current tenant's safe data. Payment
+  notices are written only through the public `tenant-payment` Edge Function.
+- The Edge Function requires `ALLOWED_ORIGINS` for deployed browser origins and uses
+  `SUPABASE_SERVICE_ROLE_KEY` only in its own function environment. Keep JWT verification
+  disabled only for this function. Never put a service-role key in frontend code.
+- A tenant payment row has `created_by = 'tenant'` and starts as
+  `pending_confirmation`; it never reduces a balance. Landlords confirm through
+  `confirm_pending_payment`, which assigns a receipt via the existing trigger, or decline
+  through `decline_pending_payment`. A declined notice is final; the tenant can submit a
+  new notice.
+- The Edge Function enforces no more than five notices per rolling 24 hours, three
+  waiting notices, and no duplicate amount/date among waiting notices. Amounts are
+  positive and capped at R50,000; dates are today in South Africa or within the preceding
+  90 days. It sniffs proof bytes and permits JPEG, PNG, WebP and PDF only; compressed
+  images are limited to 1 MB and PDFs to 2 MB.
+- Payment instructions are stored on the landlord's property and are visible to anyone
+  with a tenant link. Keep them to 500 characters and tell landlords this when saving.
+- Tenant pages expose only that tenant's payment instructions and up to ten of their
+  pending or recent declined notices. Pending notices do not change the displayed
+  balance; declined reasons are visible to that tenant for 30 days.

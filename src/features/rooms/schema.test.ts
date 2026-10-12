@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { hasDuplicateRoomName, naturalRoomSort, roomFormPayload, roomFormSchema } from "./schema";
+import {
+  bankDetailsSchema,
+  hasDuplicateRoomName,
+  naturalRoomSort,
+  roomFormPayload,
+  roomFormSchema,
+} from "./schema";
 
 describe("room ordering", () => {
   it("sorts room numbers naturally", () => {
@@ -35,5 +41,12 @@ describe("room form", () => {
     expect(roomFormSchema.safeParse({ name: "Room 1", rent: "100", dueDay: "29" }).success).toBe(
       false,
     );
+  });
+
+  describe("bank details", () => {
+    it("allows up to 500 characters and rejects longer instructions", () => {
+      expect(bankDetailsSchema.safeParse("x".repeat(500)).success).toBe(true);
+      expect(bankDetailsSchema.safeParse("x".repeat(501)).success).toBe(false);
+    });
   });
 });

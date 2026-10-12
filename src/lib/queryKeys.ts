@@ -24,6 +24,7 @@ export const queryKeys = {
     detail: (tenantId: string) => ["tenants", tenantId] as const,
     publicPage: (token: string) => ["tenant-page", token] as const,
     publicReceipts: (token: string) => ["tenant-receipts", token] as const,
+    paymentInfo: (token: string) => ["tenant-payment-info", token] as const,
   },
   charges: {
     all: ["charges"] as const,
@@ -39,6 +40,7 @@ export const queryKeys = {
     payment: (paymentId: string) => ["payments", "detail", paymentId] as const,
     month: (period: string) => ["payments", "month", period] as const,
     proofUrl: (path: string) => ["payments", "proof-url", path] as const,
+    pending: ["payments", "pending"] as const,
   },
   messaging: {
     all: ["message-log"] as const,

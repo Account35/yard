@@ -69,3 +69,31 @@ export const voidPaymentSchema = z.object({
     .min(1, "Enter a reason")
     .max(500, "Keep the reason to 500 characters or fewer"),
 });
+
+export function createConfirmPaymentSchema(today: string) {
+  return z.object({
+    amount: z.string().superRefine((value, ctx) => {
+      const parsed = toCents(value);
+      if (!parsed.ok) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: parsed.error });
+      } else if (parsed.cents <= 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Amount must be more than R0" });
+      }
+    }),
+    paidOn: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Enter a valid payment date")
+      .refine((value) => {
+        const parsed = new Date(`${value}T00:00:00Z`);
+        return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+      }, "Enter a valid payment date")
+      .refine((value) => value <= today, "Payment date cannot be in the future"),
+    method: z.enum(PAYMENT_METHODS),
+  });
+}
+
+export type ConfirmPaymentFormValues = z.input<ReturnType<typeof createConfirmPaymentSchema>>;
+
+export const declinePendingPaymentSchema = z.object({
+  reason: z.string().trim().max(500, "Keep the reason to 500 characters or fewer"),
+});

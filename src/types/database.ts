@@ -275,6 +275,7 @@ export type Database = {
           created_at: string;
           voided_at: string | null;
           void_reason: string | null;
+          decline_reason: string | null;
         };
         Insert: {
           id?: string;
@@ -289,6 +290,7 @@ export type Database = {
           created_at?: string;
           voided_at?: string | null;
           void_reason?: string | null;
+          decline_reason?: string | null;
         };
         Update: {
           id?: string;
@@ -303,6 +305,7 @@ export type Database = {
           created_at?: string;
           voided_at?: string | null;
           void_reason?: string | null;
+          decline_reason?: string | null;
         };
         Relationships: [
           {
@@ -385,6 +388,23 @@ export type Database = {
           receipt_number: string;
           balance_after_cents: number;
         }[];
+      };
+      tenant_payment_info: {
+        Args: { p_token: string };
+        Returns: Json;
+      };
+      confirm_pending_payment: {
+        Args: {
+          p_payment_id: string;
+          p_amount_cents: number;
+          p_paid_on: string;
+          p_method: string;
+        };
+        Returns: string;
+      };
+      decline_pending_payment: {
+        Args: { p_payment_id: string; p_reason: string | null };
+        Returns: undefined;
       };
       // message_log has no database RPCs.
       regenerate_tenant_token: { Args: { p_tenant_id: string }; Returns: string };

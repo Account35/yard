@@ -3,7 +3,12 @@ import { describe, expect, it } from "vitest";
 import type { Payment, Room, Tenant, TenantBalance } from "@/types/domain";
 import { formatMoney } from "@/lib/money";
 
-import { composeReceipt, composeReminder, composeWelcome } from "./compose";
+import {
+  composeReceipt,
+  composeReminder,
+  composeTenantPaymentNotice,
+  composeWelcome,
+} from "./compose";
 
 const tenant: Tenant = {
   id: "tenant-1",
@@ -55,6 +60,7 @@ const payment: Payment = {
   created_at: "2026-10-10T12:00:00Z",
   voided_at: null,
   void_reason: null,
+  decline_reason: null,
 };
 
 describe("composeWelcome", () => {
@@ -116,6 +122,29 @@ describe("composeReceipt", () => {
     expect(message.text).toContain("10 Oct");
     expect(message.text).toContain("YD-00012");
     expect(message.text).toContain("/t/private-token");
+  });
+
+  describe("composeTenantPaymentNotice", () => {
+    it.each(["en", "zu", "xh", "st"] as const)(
+      "renders the %s template for the landlord",
+      (language) => {
+        const result = composeTenantPaymentNotice(
+          {
+            tenantName: tenant.name,
+            language,
+            roomName: room.name,
+            landlordName: "Thandi Ndlovu",
+          },
+          120_000,
+          "2026-10-03",
+        );
+        expect(result.language).toBe(language);
+        expect(result.text).not.toMatch(/[{}]/);
+        expect(result.text).toContain("Ava");
+        expect(result.text).toContain("Room 2");
+        expect(result.text).toContain(formatMoney(120_000));
+      },
+    );
   });
 
   it("refuses voided payments", () => {

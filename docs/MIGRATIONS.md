@@ -19,7 +19,9 @@ tenant page.
 
 Migration `0003_public_tenant_page.sql` was created by the platform and must not be edited
 or reused. Migration `0006_tenant_portal_payments.sql` was added outside the original
-phase prompts. The next migration is `0007_message_log.sql`; apply it after `0006`.
+phase prompts. Migration `0007_message_log.sql` adds the Phase 5 message log. Migration
+`0008_tenant_payments.sql` adds tenant-submitted payment notices and token-scoped payment
+instructions; apply it manually after `0007` before deploying Phase 6.
 
 - Name files with a four-digit number and a short name, for example `0001_core_tables.sql`.
 - Never edit an old migration. Every change is a new numbered file.

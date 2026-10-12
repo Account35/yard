@@ -5,7 +5,10 @@ import { queryKeys } from "@/lib/queryKeys";
 import {
   createPayment,
   createProofSignedUrl,
+  confirmPendingPayment,
+  declinePendingPayment,
   getPayment,
+  listPendingPayments,
   listTenantPayments,
   voidPayment,
   type CreatePaymentInput,
@@ -22,6 +25,7 @@ async function invalidatePaymentData(
     queryClient.invalidateQueries({ queryKey: queryKeys.charges.tenant(tenantId) }),
     queryClient.invalidateQueries({ queryKey: queryKeys.charges.all }),
     queryClient.invalidateQueries({ queryKey: queryKeys.payments.all }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.payments.pending }),
     queryClient.invalidateQueries({ queryKey: queryKeys.payments.tenant(tenantId) }),
     ...(paymentId
       ? [queryClient.invalidateQueries({ queryKey: queryKeys.payments.payment(paymentId) })]
@@ -42,6 +46,13 @@ export function usePayment(tenantId: string, paymentId: string) {
     queryKey: queryKeys.payments.payment(paymentId),
     queryFn: () => getPayment(tenantId, paymentId),
     enabled: tenantId.length > 0 && paymentId.length > 0,
+  });
+}
+
+export function usePendingPayments() {
+  return useQuery({
+    queryKey: queryKeys.payments.pending,
+    queryFn: listPendingPayments,
   });
 }
 
@@ -71,6 +82,27 @@ export function useVoidPayment(tenantId: string) {
       voidPayment(paymentId, reason),
     onSuccess: async (_, variables) => {
       await invalidatePaymentData(queryClient, tenantId, variables.paymentId);
+    },
+  });
+}
+
+export function useConfirmPendingPayment(tenantId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: confirmPendingPayment,
+    onSuccess: async (_receiptNumber, input) => {
+      await invalidatePaymentData(queryClient, tenantId, input.paymentId);
+    },
+  });
+}
+
+export function useDeclinePendingPayment(tenantId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ paymentId, reason }: { paymentId: string; reason: string }) =>
+      declinePendingPayment(paymentId, reason),
+    onSuccess: async (_result, input) => {
+      await invalidatePaymentData(queryClient, tenantId, input.paymentId);
     },
   });
 }

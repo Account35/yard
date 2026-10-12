@@ -2,6 +2,8 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/Button";
+import { ConfirmSheet } from "@/features/payments/components/ConfirmSheet";
+import { DeclineSheet } from "@/features/payments/components/DeclineSheet";
 import { MessageSheet } from "@/features/messaging/components/MessageSheet";
 import { ProofViewer } from "@/features/payments/components/ProofViewer";
 import { ReceiptActions, type ReceiptContext } from "@/features/payments/components/ReceiptActions";
@@ -19,6 +21,14 @@ interface PaymentDetailViewProps {
   voiding: boolean;
   onVoidSheetOpenChange: (open: boolean) => void;
   onVoid: (reason: string) => Promise<void>;
+  confirming: boolean;
+  declining: boolean;
+  onConfirm: (input: {
+    amountCents: number;
+    paidOn: string;
+    method: Payment["method"];
+  }) => Promise<void>;
+  onDecline: (reason: string) => Promise<void>;
 }
 
 function localDate(timestamp: string): string {
@@ -41,11 +51,19 @@ export function PaymentDetailView({
   voiding,
   onVoidSheetOpenChange,
   onVoid,
+  confirming,
+  declining,
+  onConfirm,
+  onDecline,
 }: PaymentDetailViewProps) {
   const [receiptMessageOpen, setReceiptMessageOpen] = useState(false);
+  const [confirmSheetOpen, setConfirmSheetOpen] = useState(false);
+  const [declineSheetOpen, setDeclineSheetOpen] = useState(false);
   const line = statement.find((item) => item.kind === "payment" && item.id === payment.id);
   const isVoided = payment.status === "declined" && payment.voided_at !== null;
   const canManage = payment.status === "confirmed";
+  const isWaitingTenantNotice =
+    payment.created_by === "tenant" && payment.status === "pending_confirmation";
   return (
     <div className="space-y-6">
       {recorded && (
@@ -53,7 +71,17 @@ export function PaymentDetailView({
           Payment recorded.
         </p>
       )}
+      {payment.created_by === "tenant" && payment.status === "confirmed" && (
+        <p role="status" className="text-body text-ink">
+          Payment confirmed. Receipt {payment.receipt_number ?? "not available"}.
+        </p>
+      )}
       <section className="space-y-3 rounded-md border border-line bg-surface p-4">
+        {isWaitingTenantNotice && (
+          <p className="border-b border-line pb-3 text-body font-semibold text-ink">
+            Submitted by tenant on {formatShortDate(localDate(payment.created_at))}
+          </p>
+        )}
         <Detail label="Amount">{formatMoney(payment.amount_cents)}</Detail>
         <Detail label="Date paid">{formatShortDate(payment.paid_on)}</Detail>
         <Detail label="Method">{PAYMENT_METHOD_LABELS[payment.method]}</Detail>
@@ -69,6 +97,14 @@ export function PaymentDetailView({
             </p>
             {payment.void_reason && (
               <p className="mt-1 text-secondary text-ink">{payment.void_reason}</p>
+            )}
+          </div>
+        )}
+        {payment.status === "declined" && !isVoided && (
+          <div className="border-t border-line pt-3">
+            <p className="text-body font-semibold text-ink">Not accepted</p>
+            {payment.decline_reason && (
+              <p className="mt-1 text-secondary text-ink">Reason: {payment.decline_reason}</p>
             )}
           </div>
         )}
@@ -112,6 +148,27 @@ export function PaymentDetailView({
           </button>
         </>
       )}
+      {isWaitingTenantNotice && (
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => setConfirmSheetOpen(true)}>Confirm payment</Button>
+          <Button variant="secondary" onClick={() => setDeclineSheetOpen(true)}>
+            Decline payment
+          </Button>
+        </div>
+      )}
+      <ConfirmSheet
+        payment={payment}
+        open={confirmSheetOpen}
+        saving={confirming}
+        onOpenChange={setConfirmSheetOpen}
+        onConfirm={onConfirm}
+      />
+      <DeclineSheet
+        open={declineSheetOpen}
+        saving={declining}
+        onOpenChange={setDeclineSheetOpen}
+        onDecline={onDecline}
+      />
       <VoidSheet
         open={voidSheetOpen}
         saving={voiding}

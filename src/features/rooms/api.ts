@@ -42,6 +42,20 @@ export async function getProperty(): Promise<Property | null> {
   return data ?? null;
 }
 
+export async function updatePropertyBankDetails(
+  propertyId: string,
+  bankDetails: string | null,
+): Promise<Property> {
+  const { data, error } = await supabase
+    .from("properties")
+    .update({ bank_details: bankDetails })
+    .eq("id", propertyId)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
 export async function createRoom(input: {
   property_id: string;
   name: string;

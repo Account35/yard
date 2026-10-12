@@ -61,6 +61,10 @@ export const roomFormSchema = z.object({
     ),
 });
 
+export const bankDetailsSchema = z
+  .string()
+  .max(500, "Keep payment instructions to 500 characters or fewer");
+
 export type RoomFormValues = z.input<typeof roomFormSchema>;
 
 export function emptyRoomForm(): RoomFormValues {

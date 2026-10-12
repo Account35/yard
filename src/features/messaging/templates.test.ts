@@ -15,7 +15,7 @@ const variables = {
 };
 
 describe("message templates", () => {
-  it("renders all five templates in all languages without unresolved braces", () => {
+  it("renders all six templates in all languages without unresolved braces", () => {
     for (const language of ["en", "zu", "xh", "st"] as const) {
       for (const template of Object.values(MESSAGE_TEMPLATES)) {
         const message = renderTemplate(template[language], variables);

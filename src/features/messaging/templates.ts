@@ -1,7 +1,13 @@
 import type { Language, MessageKind } from "@/types/domain";
 
 export type MessageTemplate =
-  "welcome" | "friendlyReminder" | "gentleLateReminder" | "firmReminder" | "receipt";
+  | "welcome"
+  | "friendlyReminder"
+  | "gentleLateReminder"
+  | "firmReminder"
+  | "receipt"
+  | "tenantPaymentNotice";
+export type LoggedMessageTemplate = Exclude<MessageTemplate, "tenantPaymentNotice">;
 
 export const TRANSLATION_REVIEWED: Record<Language, boolean> = {
   en: true,
@@ -41,9 +47,15 @@ export const MESSAGE_TEMPLATES: Record<MessageTemplate, Record<Language, string>
     xh: "Molo {name}, ndifumene i-{amount} ye-{room} nge-{date}. Irisidi {receipt_number}: {link}",
     st: "Dumela {name}, ke amohetse {amount} bakeng sa {room} ka {date}. Resiti {receipt_number}: {link}",
   },
+  tenantPaymentNotice: {
+    en: "Hi, I’ve paid {amount} for {room} on {date}. Please check and confirm. - {name}",
+    zu: "Sawubona, ngikhokhile i-{amount} ye-{room} mhla ka-{date}. Ngicela uhlole uqinisekise. - {name}",
+    xh: "Molo, ndihlawulile i-{amount} ye-{room} nge-{date}. Ndicela ukhangele uqinisekise. - {name}",
+    st: "Dumela, ke lefile {amount} bakeng sa {room} ka {date}. Ka kopo hlahloba ‘me u netefatse. - {name}",
+  },
 };
 
-export const TEMPLATE_KIND: Record<MessageTemplate, MessageKind> = {
+export const TEMPLATE_KIND: Record<LoggedMessageTemplate, MessageKind> = {
   welcome: "welcome",
   friendlyReminder: "reminder",
   gentleLateReminder: "reminder",

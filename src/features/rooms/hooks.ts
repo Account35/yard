@@ -9,6 +9,7 @@ import {
   listActiveRooms,
   listInactiveRooms,
   setRoomActive,
+  updatePropertyBankDetails,
   updateRoom,
 } from "./api";
 
@@ -30,6 +31,17 @@ export function useRoom(roomId: string) {
 
 export function useProperty() {
   return useQuery({ queryKey: queryKeys.rooms.property, queryFn: getProperty });
+}
+
+export function useUpdatePropertyBankDetails() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ propertyId, bankDetails }: { propertyId: string; bankDetails: string | null }) =>
+      updatePropertyBankDetails(propertyId, bankDetails),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.rooms.property });
+    },
+  });
 }
 
 export function useCreateRoom() {

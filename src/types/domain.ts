@@ -51,6 +51,34 @@ export type Payment = Omit<Tables["payments"]["Row"], "method" | "status" | "cre
   status: PaymentRecordStatus;
   created_by: PaymentCreatedBy;
 };
+export type TenantSubmission = {
+  amountCents: number;
+  paidOn: string;
+  method: PaymentMethod;
+  status: "pending_confirmation" | "declined";
+  declineReason: string | null;
+  createdAt: string;
+};
+export type TenantPaymentInfo = {
+  tenantName: string;
+  language: Language;
+  roomName: string;
+  bankDetails: string | null;
+  landlordName: string;
+  landlordPhone: string;
+  submissions: TenantSubmission[];
+};
+export type PendingPaymentRow = {
+  paymentId: string;
+  tenantId: string;
+  tenantName: string;
+  roomName: string;
+  amountCents: number;
+  paidOn: string;
+  method: PaymentMethod;
+  hasProof: boolean;
+  createdAt: string;
+};
 export type ReceiptData = {
   receiptNumber: string;
   issuedOn: string;

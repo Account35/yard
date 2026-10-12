@@ -8,16 +8,22 @@ import type {
   Room,
   Tenant,
   TenantBalance,
+  TenantPaymentInfo,
 } from "@/types/domain";
 
-import { daysPhrase, MESSAGE_TEMPLATES, TEMPLATE_KIND, type MessageTemplate } from "./templates";
+import {
+  daysPhrase,
+  MESSAGE_TEMPLATES,
+  TEMPLATE_KIND,
+  type LoggedMessageTemplate,
+} from "./templates";
 import { renderTemplate } from "./render";
 
 export interface ComposedMessage {
   kind: MessageKind;
   language: Language;
   text: string;
-  template: MessageTemplate;
+  template: LoggedMessageTemplate;
 }
 
 export function composeWelcome(
@@ -84,7 +90,7 @@ export function composeReceipt(
 }
 
 function compose(
-  template: MessageTemplate,
+  template: LoggedMessageTemplate,
   language: Language,
   variables: Parameters<typeof renderTemplate>[1],
 ): ComposedMessage {
@@ -93,5 +99,21 @@ function compose(
     language,
     text: renderTemplate(MESSAGE_TEMPLATES[template][language], variables),
     template,
+  };
+}
+
+export function composeTenantPaymentNotice(
+  tenant: Pick<TenantPaymentInfo, "tenantName" | "language" | "roomName" | "landlordName">,
+  amountCents: number,
+  paidOn: string,
+): { language: Language; text: string } {
+  return {
+    language: tenant.language,
+    text: renderTemplate(MESSAGE_TEMPLATES.tenantPaymentNotice[tenant.language], {
+      name: tenant.tenantName,
+      room: tenant.roomName,
+      amount: amountCents,
+      date: paidOn,
+    }),
   };
 }

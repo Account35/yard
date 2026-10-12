@@ -2,6 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
+import { Link } from "@tanstack/react-router";
 import { MonthSummary } from "@/features/charges/components/MonthSummary";
 import { StatusGroup } from "@/features/charges/components/StatusGroup";
 import {
@@ -14,6 +15,7 @@ import {
 import { useMonthCharges, usePeriodPayments, useTenantBalances } from "@/features/charges/hooks";
 import { useActiveRooms } from "@/features/rooms/hooks";
 import { useCurrentTenants } from "@/features/tenants/hooks";
+import { usePendingPayments } from "@/features/payments/hooks";
 import { todayInSA, toPeriod } from "@/lib/dates";
 import { paths } from "@/router/paths";
 
@@ -25,12 +27,30 @@ export default function Home() {
   const balances = useTenantBalances();
   const charges = useMonthCharges(period);
   const payments = usePeriodPayments(period);
+  const pendingPayments = usePendingPayments();
   const queries = [tenants, rooms, balances, charges, payments];
 
   if (queries.some((query) => query.isPending)) {
     return (
       <>
         <PageHeader title="Home" />
+        {pendingPayments.isSuccess && pendingPayments.data.length > 0 && (
+          <p className="mb-4 text-body text-ink">
+            <Link to={paths.pendingPayments} className="underline">
+              {pendingPayments.data.length}{" "}
+              {pendingPayments.data.length === 1 ? "payment" : "payments"} waiting for you to
+              confirm
+            </Link>
+          </p>
+        )}
+        {pendingPayments.isError && (
+          <p role="alert" className="mb-4 text-secondary text-ink">
+            Waiting payments could not be loaded.{" "}
+            <Link to={paths.pendingPayments} className="underline">
+              Try again
+            </Link>
+          </p>
+        )}
         <p className="py-6 text-body text-ink-muted">Loading</p>
       </>
     );

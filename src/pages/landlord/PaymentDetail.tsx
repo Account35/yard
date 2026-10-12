@@ -6,7 +6,13 @@ import { PaymentDetailView } from "@/features/payments/components/PaymentDetailV
 import type { ReceiptContext } from "@/features/payments/components/ReceiptActions";
 import { buildStatement } from "@/features/charges/balance";
 import { useTenantCharges } from "@/features/charges/hooks";
-import { usePayment, useTenantPayments, useVoidPayment } from "@/features/payments/hooks";
+import {
+  useConfirmPendingPayment,
+  useDeclinePendingPayment,
+  usePayment,
+  useTenantPayments,
+  useVoidPayment,
+} from "@/features/payments/hooks";
 import { useLandlord } from "@/features/auth/hooks";
 import { useProperty, useRoom } from "@/features/rooms/hooks";
 import { useTenant } from "@/features/tenants/hooks";
@@ -23,6 +29,8 @@ export default function PaymentDetail() {
   const property = useProperty();
   const landlord = useLandlord();
   const voidMutation = useVoidPayment(tenantId);
+  const confirmMutation = useConfirmPendingPayment(tenantId);
+  const declineMutation = useDeclinePendingPayment(tenantId);
   const [voidSheetOpen, setVoidSheetOpen] = useState(false);
 
   if (
@@ -98,6 +106,14 @@ export default function PaymentDetail() {
         onVoidSheetOpenChange={setVoidSheetOpen}
         onVoid={async (reason) => {
           await voidMutation.mutateAsync({ paymentId, reason });
+        }}
+        confirming={confirmMutation.isPending}
+        declining={declineMutation.isPending}
+        onConfirm={async (input) => {
+          await confirmMutation.mutateAsync({ paymentId, ...input });
+        }}
+        onDecline={async (reason) => {
+          await declineMutation.mutateAsync({ paymentId, reason });
         }}
       />
     </>

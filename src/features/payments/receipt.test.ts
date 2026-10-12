@@ -17,6 +17,7 @@ const payment: Payment = {
   created_at: "2026-10-10T22:30:00.000Z",
   voided_at: null,
   void_reason: null,
+  decline_reason: null,
 };
 
 const tenant: Tenant = {

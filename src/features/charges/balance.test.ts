@@ -52,6 +52,7 @@ function payment(values: Partial<Payment> = {}): Payment {
     created_at: "2026-10-06T12:00:00.000Z",
     voided_at: null,
     void_reason: null,
+    decline_reason: null,
     ...values,
   };
 }
