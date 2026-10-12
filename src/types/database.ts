@@ -313,6 +313,37 @@ export type Database = {
           due_day: number;
         }[];
       };
+      get_tenant_page_v2: {
+        Args: { p_access_token: string };
+        Returns: {
+          tenant_name: string;
+          move_in_date: string;
+          move_out_date: string | null;
+          room_name: string;
+          property_name: string;
+          monthly_rent_cents: number;
+          due_day: number;
+          balance_cents: number;
+          overdue_cents: number;
+          paid_this_month_cents: number;
+          oldest_unpaid_due_date: string | null;
+          payment_status: string;
+          landlord_name: string;
+          landlord_phone: string;
+          property_address: string | null;
+        }[];
+      };
+      get_tenant_receipts: {
+        Args: { p_access_token: string };
+        Returns: {
+          paid_on: string;
+          created_at: string;
+          amount_cents: number;
+          method: string;
+          receipt_number: string;
+          balance_after_cents: number;
+        }[];
+      };
       regenerate_tenant_token: { Args: { p_tenant_id: string }; Returns: string };
       today_sa: { Args: Record<PropertyKey, never>; Returns: string };
       owns_tenant: { Args: { p_tenant_id: string }; Returns: boolean };

@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import type { Tenant } from "@/types/domain";
+import type { PaymentMethod, RentStatus, Tenant } from "@/types/domain";
 
 export async function listCurrentTenants(): Promise<Tenant[]> {
   const { data, error } = await supabase
@@ -95,10 +95,51 @@ export interface PublicTenantPage {
   property_name: string;
   monthly_rent_cents: number;
   due_day: number;
+  balance_cents: number;
+  overdue_cents: number;
+  paid_this_month_cents: number;
+  oldest_unpaid_due_date: string | null;
+  payment_status: RentStatus;
+  landlord_name: string;
+  landlord_phone: string;
+  property_address: string | null;
+}
+
+export interface PublicTenantReceipt {
+  paid_on: string;
+  created_at: string;
+  amount_cents: number;
+  method: PaymentMethod;
+  receipt_number: string;
+  balance_after_cents: number;
+}
+
+function isRentStatus(value: string): value is RentStatus {
+  return value === "paid" || value === "part_paid" || value === "late" || value === "not_due";
+}
+
+function isPaymentMethod(value: string): value is PaymentMethod {
+  return value === "cash" || value === "eft" || value === "ewallet" || value === "other";
 }
 
 export async function getPublicTenantPage(token: string): Promise<PublicTenantPage | null> {
-  const { data, error } = await supabase.rpc("get_tenant_page", { p_access_token: token });
+  const { data, error } = await supabase.rpc("get_tenant_page_v2", { p_access_token: token });
   if (error) throw error;
-  return data?.[0] ?? null;
+  const page = data?.[0];
+  if (!page) return null;
+  if (!isRentStatus(page.payment_status)) {
+    throw new Error("Tenant payment status returned an invalid value");
+  }
+  return { ...page, payment_status: page.payment_status };
+}
+
+export async function getPublicTenantReceipts(token: string): Promise<PublicTenantReceipt[]> {
+  const { data, error } = await supabase.rpc("get_tenant_receipts", { p_access_token: token });
+  if (error) throw error;
+  return (data ?? []).map((receipt) => {
+    if (!isPaymentMethod(receipt.method)) {
+      throw new Error("Tenant receipt returned an invalid payment method");
+    }
+    return { ...receipt, method: receipt.method };
+  });
 }

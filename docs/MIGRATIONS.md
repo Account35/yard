@@ -3,17 +3,19 @@
 Migrations live in `supabase/migrations/`, starting with `0001_core_tables.sql`.
 
 The tenant flow uses `0002_tenants.sql` for landlord-managed tenant records and
-`0003_public_tenant_page.sql` for the token-scoped tenant page lookup. The lookup returns
-only the tenant's name, room/property names, rent, due day and tenancy dates; it does not
-grant anonymous access to the underlying tables.
-
-Migration version `0003` is already applied. The next migration must use version `0004`;
-do not reuse `0003`. Apply each new migration to Supabase before deploying the matching
-app code.
+`0003_public_tenant_page.sql` for the token-scoped tenant page lookup. `0006` extends that
+page with a balance/status lookup and confirmed receipt history through token-scoped RPCs;
+anonymous users still receive no direct access to tenant, landlord, charge, or payment
+tables. Apply each new migration to Supabase before deploying the matching app code.
 
 Phase 3 uses `0004_charges_and_balances.sql`. Phase 4 adds
 `0005_payments_and_receipts.sql`; apply it manually in the Supabase SQL editor, then
 regenerate the database types from the updated schema before deploying Phase 4.
+
+The tenant portal payment extension is `0006_tenant_portal_payments.sql`. It adds
+token-scoped RPCs for tenant balance/status and confirmed receipt history without granting
+anonymous access to the underlying tables. Apply it manually before deploying the updated
+tenant page.
 
 - Name files with a four-digit number and a short name, for example `0001_core_tables.sql`.
 - Never edit an old migration. Every change is a new numbered file.

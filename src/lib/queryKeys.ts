@@ -23,6 +23,7 @@ export const queryKeys = {
     room: (roomId: string) => ["tenants", "room", roomId] as const,
     detail: (tenantId: string) => ["tenants", tenantId] as const,
     publicPage: (token: string) => ["tenant-page", token] as const,
+    publicReceipts: (token: string) => ["tenant-receipts", token] as const,
   },
   charges: {
     all: ["charges"] as const,

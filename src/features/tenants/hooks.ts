@@ -7,6 +7,7 @@ import {
   createTenant,
   getTenant,
   getPublicTenantPage,
+  getPublicTenantReceipts,
   listCurrentTenants,
   listPreviousTenantsForRoom,
   listTenantsForRoom,
@@ -106,6 +107,14 @@ export function usePublicTenantPage(token: string) {
   return useQuery({
     queryKey: queryKeys.tenants.publicPage(token),
     queryFn: () => getPublicTenantPage(token),
+    enabled: token.length > 0,
+  });
+}
+
+export function usePublicTenantReceipts(token: string) {
+  return useQuery({
+    queryKey: queryKeys.tenants.publicReceipts(token),
+    queryFn: () => getPublicTenantReceipts(token),
     enabled: token.length > 0,
   });
 }

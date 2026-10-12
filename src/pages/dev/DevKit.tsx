@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -12,6 +13,7 @@ import { Sheet } from "@/components/ui/Sheet";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { formatMoney } from "@/lib/money";
 import { queryKeys } from "@/lib/queryKeys";
+import { paths } from "@/router/paths";
 import { supabase } from "@/lib/supabase";
 
 const sampleAmounts = [0, 5000, 120000, 125050, -5000, 123456789];
@@ -54,6 +56,12 @@ export default function DevKit() {
 
       <Section title="Connection">
         <SupabaseLine />
+        <Link
+          className="inline-flex min-h-12 items-center justify-center self-start rounded-sm border border-line-strong bg-ground px-4 text-body font-semibold text-ink"
+          to={paths.tenant.replace("$token", "preview")}
+        >
+          Preview tenant page
+        </Link>
         <p className="money text-body">
           Money: {sampleAmounts.map((c) => formatMoney(c)).join("  |  ")}
         </p>
