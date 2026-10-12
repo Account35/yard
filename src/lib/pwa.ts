@@ -64,3 +64,11 @@ export function registerServiceWorker(): void {
   }
   void navigator.serviceWorker.register("/sw.js", { scope: "/" });
 }
+
+/** For error screens: returns true when the error is a stale page file and a reload was started. */
+export function recoverFromStaleChunk(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  if (!isStaleChunkError(message)) return false;
+  reloadForStaleChunk();
+  return true;
+}

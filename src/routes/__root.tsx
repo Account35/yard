@@ -15,7 +15,7 @@ import { useEffect, type ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
 import { AuthProvider } from "@/features/auth/AuthProvider";
 import { envResult } from "@/lib/env";
-import { registerServiceWorker } from "@/lib/pwa";
+import { recoverFromStaleChunk, registerServiceWorker } from "@/lib/pwa";
 import NotFound from "@/pages/NotFound";
 
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -25,6 +25,7 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
+    if (recoverFromStaleChunk(error)) return;
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
