@@ -9,6 +9,7 @@ import { daysLate, deriveStatus } from "@/features/charges/balance";
 import { useTenantBalances, useTenantCharges } from "@/features/charges/hooks";
 import { useTenantPayments } from "@/features/payments/hooks";
 import { useRoom } from "@/features/rooms/hooks";
+import { MoveOutSheet } from "@/features/tenants/components/MoveOutSheet";
 import { useMoveOutTenant, useRegenerateTenantToken, useTenant } from "@/features/tenants/hooks";
 import { formatShortDate, todayInSA } from "@/lib/dates";
 import { tenantLink } from "@/lib/links";
@@ -28,6 +29,7 @@ export default function TenantDetail() {
   const paymentsQuery = useTenantPayments(tenantId);
   const moveOut = useMoveOutTenant();
   const regenerate = useRegenerateTenantToken();
+  const [moveOutOpen, setMoveOutOpen] = useState(false);
   const [copyMessage, setCopyMessage] = useState("");
   const [actionError, setActionError] = useState("");
   const [tokenOverride, setTokenOverride] = useState<string | null>(null);
@@ -67,20 +69,11 @@ export default function TenantDetail() {
     }
   }
 
-  async function moveOutTenant() {
+  async function moveOutTenant(moveOutDate: string) {
     if (!tenant) return;
-    const balanceWarning =
-      balance && balance.balanceCents > 0
-        ? ` There is an outstanding balance of ${formatMoney(balance.balanceCents)}.`
-        : "";
-    if (!window.confirm(`Move ${tenant.name} out today?${balanceWarning}`)) return;
     setActionError("");
-    try {
-      await moveOut.mutateAsync({ tenantId: tenant.id, moveOutDate: todayInSA() });
-      await navigate({ to: paths.rooms });
-    } catch (error) {
-      setActionError(error instanceof Error ? error.message : "The tenant could not be moved out.");
-    }
+    await moveOut.mutateAsync({ tenantId: tenant.id, moveOutDate });
+    await navigate({ to: paths.rooms });
   }
 
   return (
@@ -182,16 +175,22 @@ export default function TenantDetail() {
                 >
                   Edit
                 </Button>
-                <Button
-                  variant="secondary"
-                  loading={moveOut.isPending}
-                  onClick={() => void moveOutTenant()}
-                >
+                <Button variant="secondary" onClick={() => setMoveOutOpen(true)}>
                   Move out
                 </Button>
               </>
             )}
           </div>
+          {!tenant.move_out_date && (
+            <MoveOutSheet
+              open={moveOutOpen}
+              onOpenChange={setMoveOutOpen}
+              tenantName={tenant.name}
+              moveInDate={tenant.move_in_date}
+              balanceCents={balance?.balanceCents ?? 0}
+              onConfirm={moveOutTenant}
+            />
+          )}
 
           {balancesQuery.isPending || chargesQuery.isPending || paymentsQuery.isPending ? (
             <p className="py-4 text-body text-ink-muted">Loading statement...</p>
