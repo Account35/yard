@@ -21,6 +21,7 @@ export function BottomNav() {
           <li key={to}>
             <Link
               to={to}
+              activeOptions={{ exact: false }}
               className="group relative flex min-h-14 flex-col items-center justify-center gap-0.5 text-secondary text-ink-muted"
               activeProps={{ className: "text-brand font-semibold", "aria-current": "page" }}
             >

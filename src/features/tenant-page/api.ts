@@ -1,6 +1,8 @@
 import { requireEnv } from "@/lib/env";
 import { supabase } from "@/lib/supabase";
+import { todayInSA } from "@/lib/dates";
 import type { Language, PaymentMethod, TenantPaymentInfo } from "@/types/domain";
+import { lastSixMonthsCharges, type PublicTenantCharge } from "./charges";
 
 function isPaymentMethod(value: unknown): value is PaymentMethod {
   return value === "cash" || value === "eft" || value === "ewallet" || value === "other";
@@ -65,6 +67,7 @@ export async function getTenantPaymentInfo(token: string): Promise<TenantPayment
   ) {
     throw new Error("Tenant payment details were invalid.");
   }
+
   return {
     tenantName,
     language,
@@ -74,6 +77,43 @@ export async function getTenantPaymentInfo(token: string): Promise<TenantPayment
     landlordPhone,
     submissions: submissions.map(parseSubmission),
   };
+}
+
+function isChargeType(value: unknown): value is PublicTenantCharge["type"] {
+  return value === "rent" || value === "electricity" || value === "water" || value === "other";
+}
+
+export async function getPublicTenantCharges(token: string): Promise<PublicTenantCharge[]> {
+  const { data, error } = await supabase.rpc("tenant_charges", { p_token: token });
+  if (error) throw error;
+  if (data === null) return [];
+  if (!Array.isArray(data)) throw new Error("Tenant charges returned an invalid result.");
+  const charges = data.map((item, index) => {
+    if (!isRecord(item)) throw new Error("Tenant charge was invalid.");
+    const type = item["type"];
+    const period = item["period"];
+    const amountCents = item["amount_cents"];
+    const dueDate = item["due_date"];
+    const note = item["note"];
+    if (
+      !isChargeType(type) ||
+      typeof period !== "string" ||
+      typeof amountCents !== "number" ||
+      typeof dueDate !== "string" ||
+      (note !== null && typeof note !== "string")
+    ) {
+      throw new Error("Tenant charge was invalid.");
+    }
+    return {
+      id: `${dueDate}-${type}-${period}-${index}`,
+      type,
+      period,
+      amountCents,
+      dueDate,
+      note,
+    };
+  });
+  return lastSixMonthsCharges(charges, todayInSA());
 }
 
 export type TenantNoticeErrorCode =

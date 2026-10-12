@@ -34,6 +34,7 @@ function charge(values: Partial<Charge> = {}): Charge {
     due_date: "2026-10-05",
     note: null,
     created_at: "2026-10-01T00:00:00.000Z",
+    utility_bill_id: null,
     ...values,
   };
 }
@@ -164,16 +165,45 @@ describe("buildStatement", () => {
   it("returns no lines when there are no charges or payments", () => {
     expect(buildStatement([], [])).toEqual([]);
   });
+
+  it("labels utility charges with the bill type and period and retains the explanation", () => {
+    const lines = buildStatement(
+      [
+        charge({
+          type: "electricity",
+          period: "2026-10",
+          note: "Your share of the R1 800 electricity bill for October 2026.",
+        }),
+      ],
+      [],
+    );
+    expect(lines[0]).toMatchObject({
+      description: "Electricity, October 2026",
+      note: "Your share of the R1 800 electricity bill for October 2026.",
+    });
+  });
 });
 
 describe("summariseMonth", () => {
-  it("summarises confirmed current-month payments, current-period charges and positive current balances", () => {
+  it("summarises confirmed current-month payments, charges due this month and positive current balances", () => {
     expect(
       summariseMonth(
         "2026-10",
         [
           charge({ id: "oct", amount_cents: 120_000 }),
-          charge({ id: "nov", period: "2026-11", amount_cents: 50_000 }),
+          charge({
+            id: "last-month-utility",
+            type: "water",
+            period: "2026-09",
+            due_date: "2026-10-12",
+            amount_cents: 50_000,
+          }),
+          charge({
+            id: "nov",
+            period: "2026-11",
+            due_date: "2026-11-05",
+            amount_cents: 60_000,
+          }),
         ],
         [
           payment({ id: "oct-payment", amount_cents: 20_000 }),
@@ -185,7 +215,7 @@ describe("summariseMonth", () => {
           balance({ tenantId: "tenant-2", balanceCents: -20_000 }),
         ],
       ),
-    ).toEqual({ collectedCents: 20_000, expectedCents: 120_000, outstandingCents: 100_000 });
+    ).toEqual({ collectedCents: 20_000, expectedCents: 170_000, outstandingCents: 100_000 });
   });
 });
 

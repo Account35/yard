@@ -25,6 +25,7 @@ export const queryKeys = {
     publicPage: (token: string) => ["tenant-page", token] as const,
     publicReceipts: (token: string) => ["tenant-receipts", token] as const,
     paymentInfo: (token: string) => ["tenant-payment-info", token] as const,
+    publicCharges: (token: string) => ["tenant-charges", token] as const,
   },
   charges: {
     all: ["charges"] as const,
@@ -45,5 +46,12 @@ export const queryKeys = {
   messaging: {
     all: ["message-log"] as const,
     recent: ["message-log", "recent"] as const,
+  },
+  utilities: {
+    all: ["utility-bills"] as const,
+    bills: (propertyId: string) => ["utility-bills", propertyId] as const,
+    bill: (billId: string) => ["utility-bill", billId] as const,
+    readings: (type: string, roomIds: string[]) =>
+      ["meter-readings", type, ...[...roomIds].sort()] as const,
   },
 } as const;

@@ -7,6 +7,8 @@ export type PaymentStatus = "paid" | "part_paid" | "late" | "not_due";
 export type RentStatus = PaymentStatus;
 
 export type ChargeType = "rent" | "electricity" | "water" | "other";
+export type UtilityType = "electricity" | "water";
+export type SplitMethod = "equal" | "by_room" | "custom";
 export type PaymentMethod = "cash" | "eft" | "ewallet" | "other";
 export type PaymentRecordStatus = "confirmed" | "pending_confirmation" | "declined";
 export type PaymentCreatedBy = "landlord" | "tenant";
@@ -16,6 +18,22 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   eft: "EFT",
   ewallet: "eWallet",
   other: "Other",
+};
+
+export const UTILITY_LABELS: Record<UtilityType, string> = {
+  electricity: "Electricity",
+  water: "Water",
+};
+
+export const UTILITY_UNITS: Record<UtilityType, string> = {
+  electricity: "kWh",
+  water: "kL",
+};
+
+export const SPLIT_METHOD_LABELS: Record<SplitMethod, string> = {
+  equal: "Split equally",
+  by_room: "By usage",
+  custom: "Custom amounts",
 };
 
 export type Language = "en" | "zu" | "xh" | "st";
@@ -45,6 +63,27 @@ export type Tenant = Omit<Tables["tenants"]["Row"], "language"> & {
 };
 export type Charge = Omit<Tables["charges"]["Row"], "type"> & {
   type: ChargeType;
+};
+export type UtilityShare = {
+  roomId: string;
+  tenantId: string;
+  amountCents: number;
+  unitsMilli: number | null;
+  previousReading: number | null;
+  currentReading: number | null;
+  note: string;
+};
+export type UtilityBill = Omit<
+  Tables["utility_bills"]["Row"],
+  "type" | "split_method" | "shares"
+> & {
+  type: UtilityType;
+  split_method: SplitMethod;
+  shares: UtilityShare[];
+};
+export type MeterReading = Omit<Tables["meter_readings"]["Row"], "type" | "reading"> & {
+  type: UtilityType;
+  reading: number;
 };
 export type Payment = Omit<Tables["payments"]["Row"], "method" | "status" | "created_by"> & {
   method: PaymentMethod;

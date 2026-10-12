@@ -224,3 +224,23 @@ Differences from the original Phase 0 brief, required by the framework:
 - Tenant pages expose only that tenant's payment instructions and up to ten of their
   pending or recent declined notices. Pending notices do not change the displayed
   balance; declined reasons are visible to that tenant for 30 days.
+
+## Utilities (Phase 7)
+
+- Apply `0009_utilities.sql` manually after `0008_tenant_payments.sql`. It adds utility
+  bill snapshots, room meter readings, a nullable utility-bill link on charges, and the
+  `create_utility_bill`, `void_utility_bill`, and token-scoped `tenant_charges` functions.
+- Utility bill types are electricity and water; usage is integer thousandths of kWh or kL.
+  Money remains integer cents. Allocate integer amounts with the largest-remainder
+  method and `BigInt` intermediate multiplication; tie remainders follow natural room
+  name order. Shares plus the uncharged main-house amount must equal the bill total.
+- Only rooms with current tenants may be charged. Vacant rooms are not selectable.
+  Bills are immutable snapshots. Undo within 14 days deletes the linked charges and
+  saved room readings and marks the bill undone; after that, correct individual charges
+  from the tenant statement.
+- A utility charge keeps its English calculation note. Statements label charges by type
+  and period (for example, “Electricity, October 2026”) and show that note underneath.
+- “Expected this month” means the sum of charges whose `due_date` falls in the current
+  South African calendar month, regardless of the charge period.
+- The public `tenant_charges(token)` function returns only the tenant's recent charges.
+  Tenants do not get direct access to charges, utility bills, or meter-reading tables.

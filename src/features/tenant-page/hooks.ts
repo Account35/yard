@@ -2,7 +2,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { queryKeys } from "@/lib/queryKeys";
 
-import { getTenantPaymentInfo, submitTenantPayment } from "./api";
+import { getPublicTenantCharges, getTenantPaymentInfo, submitTenantPayment } from "./api";
+
+export function usePublicTenantCharges(token: string) {
+  return useQuery({
+    queryKey: queryKeys.tenants.publicCharges(token),
+    queryFn: () => getPublicTenantCharges(token),
+    enabled: token.length > 0,
+  });
+}
 
 export function useTenantPaymentInfo(token: string) {
   return useQuery({

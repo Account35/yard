@@ -230,6 +230,7 @@ export type Database = {
           due_date: string;
           note: string | null;
           created_at: string;
+          utility_bill_id: string | null;
         };
         Insert: {
           id?: string;
@@ -240,6 +241,7 @@ export type Database = {
           due_date: string;
           note?: string | null;
           created_at?: string;
+          utility_bill_id?: string | null;
         };
         Update: {
           id?: string;
@@ -250,6 +252,7 @@ export type Database = {
           due_date?: string;
           note?: string | null;
           created_at?: string;
+          utility_bill_id?: string | null;
         };
         Relationships: [
           {
@@ -257,6 +260,114 @@ export type Database = {
             columns: ["tenant_id"];
             isOneToOne: false;
             referencedRelation: "tenants";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "charges_utility_bill_id_fkey";
+            columns: ["utility_bill_id"];
+            isOneToOne: false;
+            referencedRelation: "utility_bills";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      utility_bills: {
+        Row: {
+          id: string;
+          property_id: string;
+          type: string;
+          period: string;
+          total_cents: number;
+          split_method: string;
+          due_date: string;
+          includes_main_house: boolean;
+          main_house_cents: number;
+          shares: Json;
+          note: string | null;
+          voided_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          property_id: string;
+          type: string;
+          period: string;
+          total_cents: number;
+          split_method: string;
+          due_date: string;
+          includes_main_house?: boolean;
+          main_house_cents?: number;
+          shares?: Json;
+          note?: string | null;
+          voided_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          property_id?: string;
+          type?: string;
+          period?: string;
+          total_cents?: number;
+          split_method?: string;
+          due_date?: string;
+          includes_main_house?: boolean;
+          main_house_cents?: number;
+          shares?: Json;
+          note?: string | null;
+          voided_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "utility_bills_property_id_fkey";
+            columns: ["property_id"];
+            isOneToOne: false;
+            referencedRelation: "properties";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      meter_readings: {
+        Row: {
+          id: string;
+          room_id: string;
+          type: string;
+          reading: number;
+          read_on: string;
+          bill_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          room_id: string;
+          type: string;
+          reading: number;
+          read_on?: string;
+          bill_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          room_id?: string;
+          type?: string;
+          reading?: number;
+          read_on?: string;
+          bill_id?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "meter_readings_bill_id_fkey";
+            columns: ["bill_id"];
+            isOneToOne: false;
+            referencedRelation: "utility_bills";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "meter_readings_room_id_fkey";
+            columns: ["room_id"];
+            isOneToOne: false;
+            referencedRelation: "rooms";
             referencedColumns: ["id"];
           },
         ];
@@ -411,6 +522,24 @@ export type Database = {
       today_sa: { Args: Record<PropertyKey, never>; Returns: string };
       owns_tenant: { Args: { p_tenant_id: string }; Returns: boolean };
       generate_rent_charges: { Args: Record<PropertyKey, never>; Returns: number };
+      create_utility_bill: {
+        Args: {
+          p_property_id: string;
+          p_type: string;
+          p_period: string;
+          p_total_cents: number;
+          p_split_method: string;
+          p_due_date: string;
+          p_includes_main_house: boolean;
+          p_main_house_cents: number;
+          p_shares: Json;
+          p_readings: Json;
+          p_note: string | null;
+        };
+        Returns: string;
+      };
+      void_utility_bill: { Args: { p_bill_id: string }; Returns: undefined };
+      tenant_charges: { Args: { p_token: string }; Returns: Json };
       void_payment: {
         Args: { p_payment_id: string; p_reason: string };
         Returns: undefined;

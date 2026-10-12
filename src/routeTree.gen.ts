@@ -20,11 +20,14 @@ import { Route as LandlordRemindRouteImport } from './routes/_landlord.remind'
 import { Route as LandlordRoomsRouteImport } from './routes/_landlord.rooms'
 import { Route as LandlordSettingsRouteImport } from './routes/_landlord.settings'
 import { Route as DevKitRouteImport } from './routes/dev.kit'
+import { Route as LandlordMoneyUtilitiesRouteImport } from './routes/_landlord.money.utilities'
 import { Route as LandlordPaymentsPendingRouteImport } from './routes/_landlord.payments.pending'
 import { Route as LandlordRoomsRoomIdRouteImport } from './routes/_landlord.rooms.$roomId'
 import { Route as LandlordTenantsTenantIdRouteImport } from './routes/_landlord.tenants.$tenantId'
 import { Route as LandlordTenantsNewRouteImport } from './routes/_landlord.tenants.new'
 import { Route as TenantTTokenRouteImport } from './routes/_tenant.t.$token'
+import { Route as LandlordMoneyUtilitiesBillIdRouteImport } from './routes/_landlord.money.utilities.$billId'
+import { Route as LandlordMoneyUtilitiesNewRouteImport } from './routes/_landlord.money.utilities.new'
 import { Route as LandlordTenantsTenantIdEditRouteImport } from './routes/_landlord.tenants.$tenantId.edit'
 import { Route as LandlordTenantsTenantIdPaymentsPaymentIdRouteImport } from './routes/_landlord.tenants.$tenantId.payments.$paymentId'
 import { Route as LandlordTenantsTenantIdPaymentsNewRouteImport } from './routes/_landlord.tenants.$tenantId.payments.new'
@@ -82,6 +85,11 @@ const DevKitRoute = DevKitRouteImport.update({
   path: '/dev/kit',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LandlordMoneyUtilitiesRoute = LandlordMoneyUtilitiesRouteImport.update({
+  id: '/utilities',
+  path: '/utilities',
+  getParentRoute: () => LandlordMoneyRoute,
+} as any)
 const LandlordPaymentsPendingRoute = LandlordPaymentsPendingRouteImport.update({
   id: '/payments/pending',
   path: '/payments/pending',
@@ -107,6 +115,18 @@ const TenantTTokenRoute = TenantTTokenRouteImport.update({
   path: '/t/$token',
   getParentRoute: () => TenantRoute,
 } as any)
+const LandlordMoneyUtilitiesBillIdRoute =
+  LandlordMoneyUtilitiesBillIdRouteImport.update({
+    id: '/$billId',
+    path: '/$billId',
+    getParentRoute: () => LandlordMoneyUtilitiesRoute,
+  } as any)
+const LandlordMoneyUtilitiesNewRoute =
+  LandlordMoneyUtilitiesNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => LandlordMoneyUtilitiesRoute,
+  } as any)
 const LandlordTenantsTenantIdEditRoute =
   LandlordTenantsTenantIdEditRouteImport.update({
     id: '/edit',
@@ -131,16 +151,19 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/sign-in': typeof SignInRoute
   '/home': typeof LandlordHomeRoute
-  '/money': typeof LandlordMoneyRoute
+  '/money': typeof LandlordMoneyRouteWithChildren
   '/remind': typeof LandlordRemindRoute
   '/rooms': typeof LandlordRoomsRouteWithChildren
   '/settings': typeof LandlordSettingsRoute
   '/dev/kit': typeof DevKitRoute
+  '/money/utilities': typeof LandlordMoneyUtilitiesRouteWithChildren
   '/payments/pending': typeof LandlordPaymentsPendingRoute
   '/rooms/$roomId': typeof LandlordRoomsRoomIdRoute
   '/tenants/$tenantId': typeof LandlordTenantsTenantIdRouteWithChildren
   '/tenants/new': typeof LandlordTenantsNewRoute
   '/t/$token': typeof TenantTTokenRoute
+  '/money/utilities/$billId': typeof LandlordMoneyUtilitiesBillIdRoute
+  '/money/utilities/new': typeof LandlordMoneyUtilitiesNewRoute
   '/tenants/$tenantId/edit': typeof LandlordTenantsTenantIdEditRoute
   '/tenants/$tenantId/payments/$paymentId': typeof LandlordTenantsTenantIdPaymentsPaymentIdRoute
   '/tenants/$tenantId/payments/new': typeof LandlordTenantsTenantIdPaymentsNewRoute
@@ -150,16 +173,19 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/sign-in': typeof SignInRoute
   '/home': typeof LandlordHomeRoute
-  '/money': typeof LandlordMoneyRoute
+  '/money': typeof LandlordMoneyRouteWithChildren
   '/remind': typeof LandlordRemindRoute
   '/rooms': typeof LandlordRoomsRouteWithChildren
   '/settings': typeof LandlordSettingsRoute
   '/dev/kit': typeof DevKitRoute
+  '/money/utilities': typeof LandlordMoneyUtilitiesRouteWithChildren
   '/payments/pending': typeof LandlordPaymentsPendingRoute
   '/rooms/$roomId': typeof LandlordRoomsRoomIdRoute
   '/tenants/$tenantId': typeof LandlordTenantsTenantIdRouteWithChildren
   '/tenants/new': typeof LandlordTenantsNewRoute
   '/t/$token': typeof TenantTTokenRoute
+  '/money/utilities/$billId': typeof LandlordMoneyUtilitiesBillIdRoute
+  '/money/utilities/new': typeof LandlordMoneyUtilitiesNewRoute
   '/tenants/$tenantId/edit': typeof LandlordTenantsTenantIdEditRoute
   '/tenants/$tenantId/payments/$paymentId': typeof LandlordTenantsTenantIdPaymentsPaymentIdRoute
   '/tenants/$tenantId/payments/new': typeof LandlordTenantsTenantIdPaymentsNewRoute
@@ -172,16 +198,19 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/sign-in': typeof SignInRoute
   '/_landlord/home': typeof LandlordHomeRoute
-  '/_landlord/money': typeof LandlordMoneyRoute
+  '/_landlord/money': typeof LandlordMoneyRouteWithChildren
   '/_landlord/remind': typeof LandlordRemindRoute
   '/_landlord/rooms': typeof LandlordRoomsRouteWithChildren
   '/_landlord/settings': typeof LandlordSettingsRoute
   '/dev/kit': typeof DevKitRoute
+  '/_landlord/money/utilities': typeof LandlordMoneyUtilitiesRouteWithChildren
   '/_landlord/payments/pending': typeof LandlordPaymentsPendingRoute
   '/_landlord/rooms/$roomId': typeof LandlordRoomsRoomIdRoute
   '/_landlord/tenants/$tenantId': typeof LandlordTenantsTenantIdRouteWithChildren
   '/_landlord/tenants/new': typeof LandlordTenantsNewRoute
   '/_tenant/t/$token': typeof TenantTTokenRoute
+  '/_landlord/money/utilities/$billId': typeof LandlordMoneyUtilitiesBillIdRoute
+  '/_landlord/money/utilities/new': typeof LandlordMoneyUtilitiesNewRoute
   '/_landlord/tenants/$tenantId/edit': typeof LandlordTenantsTenantIdEditRoute
   '/_landlord/tenants/$tenantId/payments/$paymentId': typeof LandlordTenantsTenantIdPaymentsPaymentIdRoute
   '/_landlord/tenants/$tenantId/payments/new': typeof LandlordTenantsTenantIdPaymentsNewRoute
@@ -198,11 +227,14 @@ export interface FileRouteTypes {
     | '/rooms'
     | '/settings'
     | '/dev/kit'
+    | '/money/utilities'
     | '/payments/pending'
     | '/rooms/$roomId'
     | '/tenants/$tenantId'
     | '/tenants/new'
     | '/t/$token'
+    | '/money/utilities/$billId'
+    | '/money/utilities/new'
     | '/tenants/$tenantId/edit'
     | '/tenants/$tenantId/payments/$paymentId'
     | '/tenants/$tenantId/payments/new'
@@ -217,11 +249,14 @@ export interface FileRouteTypes {
     | '/rooms'
     | '/settings'
     | '/dev/kit'
+    | '/money/utilities'
     | '/payments/pending'
     | '/rooms/$roomId'
     | '/tenants/$tenantId'
     | '/tenants/new'
     | '/t/$token'
+    | '/money/utilities/$billId'
+    | '/money/utilities/new'
     | '/tenants/$tenantId/edit'
     | '/tenants/$tenantId/payments/$paymentId'
     | '/tenants/$tenantId/payments/new'
@@ -238,11 +273,14 @@ export interface FileRouteTypes {
     | '/_landlord/rooms'
     | '/_landlord/settings'
     | '/dev/kit'
+    | '/_landlord/money/utilities'
     | '/_landlord/payments/pending'
     | '/_landlord/rooms/$roomId'
     | '/_landlord/tenants/$tenantId'
     | '/_landlord/tenants/new'
     | '/_tenant/t/$token'
+    | '/_landlord/money/utilities/$billId'
+    | '/_landlord/money/utilities/new'
     | '/_landlord/tenants/$tenantId/edit'
     | '/_landlord/tenants/$tenantId/payments/$paymentId'
     | '/_landlord/tenants/$tenantId/payments/new'
@@ -336,6 +374,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevKitRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_landlord/money/utilities': {
+      id: '/_landlord/money/utilities'
+      path: '/utilities'
+      fullPath: '/money/utilities'
+      preLoaderRoute: typeof LandlordMoneyUtilitiesRouteImport
+      parentRoute: typeof LandlordMoneyRoute
+    }
     '/_landlord/payments/pending': {
       id: '/_landlord/payments/pending'
       path: '/payments/pending'
@@ -371,6 +416,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TenantTTokenRouteImport
       parentRoute: typeof TenantRoute
     }
+    '/_landlord/money/utilities/$billId': {
+      id: '/_landlord/money/utilities/$billId'
+      path: '/$billId'
+      fullPath: '/money/utilities/$billId'
+      preLoaderRoute: typeof LandlordMoneyUtilitiesBillIdRouteImport
+      parentRoute: typeof LandlordMoneyUtilitiesRoute
+    }
+    '/_landlord/money/utilities/new': {
+      id: '/_landlord/money/utilities/new'
+      path: '/new'
+      fullPath: '/money/utilities/new'
+      preLoaderRoute: typeof LandlordMoneyUtilitiesNewRouteImport
+      parentRoute: typeof LandlordMoneyUtilitiesRoute
+    }
     '/_landlord/tenants/$tenantId/edit': {
       id: '/_landlord/tenants/$tenantId/edit'
       path: '/edit'
@@ -394,6 +453,34 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface LandlordMoneyUtilitiesRouteChildren {
+  LandlordMoneyUtilitiesBillIdRoute: typeof LandlordMoneyUtilitiesBillIdRoute
+  LandlordMoneyUtilitiesNewRoute: typeof LandlordMoneyUtilitiesNewRoute
+}
+
+const LandlordMoneyUtilitiesRouteChildren: LandlordMoneyUtilitiesRouteChildren =
+  {
+    LandlordMoneyUtilitiesBillIdRoute: LandlordMoneyUtilitiesBillIdRoute,
+    LandlordMoneyUtilitiesNewRoute: LandlordMoneyUtilitiesNewRoute,
+  }
+
+const LandlordMoneyUtilitiesRouteWithChildren =
+  LandlordMoneyUtilitiesRoute._addFileChildren(
+    LandlordMoneyUtilitiesRouteChildren,
+  )
+
+interface LandlordMoneyRouteChildren {
+  LandlordMoneyUtilitiesRoute: typeof LandlordMoneyUtilitiesRouteWithChildren
+}
+
+const LandlordMoneyRouteChildren: LandlordMoneyRouteChildren = {
+  LandlordMoneyUtilitiesRoute: LandlordMoneyUtilitiesRouteWithChildren,
+}
+
+const LandlordMoneyRouteWithChildren = LandlordMoneyRoute._addFileChildren(
+  LandlordMoneyRouteChildren,
+)
 
 interface LandlordRoomsRouteChildren {
   LandlordRoomsRoomIdRoute: typeof LandlordRoomsRoomIdRoute
@@ -429,7 +516,7 @@ const LandlordTenantsTenantIdRouteWithChildren =
 
 interface LandlordRouteChildren {
   LandlordHomeRoute: typeof LandlordHomeRoute
-  LandlordMoneyRoute: typeof LandlordMoneyRoute
+  LandlordMoneyRoute: typeof LandlordMoneyRouteWithChildren
   LandlordRemindRoute: typeof LandlordRemindRoute
   LandlordRoomsRoute: typeof LandlordRoomsRouteWithChildren
   LandlordSettingsRoute: typeof LandlordSettingsRoute
@@ -440,7 +527,7 @@ interface LandlordRouteChildren {
 
 const LandlordRouteChildren: LandlordRouteChildren = {
   LandlordHomeRoute: LandlordHomeRoute,
-  LandlordMoneyRoute: LandlordMoneyRoute,
+  LandlordMoneyRoute: LandlordMoneyRouteWithChildren,
   LandlordRemindRoute: LandlordRemindRoute,
   LandlordRoomsRoute: LandlordRoomsRouteWithChildren,
   LandlordSettingsRoute: LandlordSettingsRoute,

@@ -23,6 +23,12 @@ phase prompts. Migration `0007_message_log.sql` adds the Phase 5 message log. Mi
 `0008_tenant_payments.sql` adds tenant-submitted payment notices and token-scoped payment
 instructions; apply it manually after `0007` before deploying Phase 6.
 
+`0009_utilities.sql` adds utility bill snapshots and meter readings, links utility
+charges to bills, and provides atomic create/undo RPCs plus a token-scoped tenant charges
+function. Apply it manually after `0008` before deploying Phase 7. The checked-in
+`src/types/database.ts` is aligned to the migration; regenerate it against Supabase
+after the migration has been applied.
+
 - Name files with a four-digit number and a short name, for example `0001_core_tables.sql`.
 - Never edit an old migration. Every change is a new numbered file.
 - Changes are additive only: new tables, new nullable columns, or columns with a safe default.

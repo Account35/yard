@@ -32,7 +32,8 @@ export async function listMonthCharges(period: string): Promise<Charge[]> {
   const { data, error } = await supabase
     .from("charges")
     .select("*")
-    .eq("period", period)
+    .gte("due_date", `${period}-01`)
+    .lt("due_date", nextPeriodStart(period))
     .order("due_date", { ascending: true });
   if (error) throw error;
   return (data ?? []) as Charge[];

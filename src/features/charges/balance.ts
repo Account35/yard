@@ -133,18 +133,28 @@ export function summariseMonth(
   currentTenantBalances: TenantBalance[],
 ): MonthSummary {
   const prefix = `${period}-`;
+  const nextPeriod = nextPeriodStart(period);
   return {
     collectedCents: payments
       .filter((payment) => payment.status === "confirmed" && payment.paid_on.startsWith(prefix))
       .reduce((total, payment) => total + payment.amount_cents, 0),
     expectedCents: charges
-      .filter((charge) => charge.period === period)
+      .filter((charge) => charge.due_date >= `${period}-01` && charge.due_date < nextPeriod)
       .reduce((total, charge) => total + charge.amount_cents, 0),
     outstandingCents: currentTenantBalances.reduce(
       (total, balance) => total + Math.max(0, balance.balanceCents),
       0,
     ),
   };
+}
+
+function nextPeriodStart(period: string): string {
+  const match = /^(\d{4})-(\d{2})$/.exec(period);
+  if (!match) throw new Error(`Invalid period: ${period}`);
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  if (month < 1 || month > 12) throw new Error(`Invalid period: ${period}`);
+  return new Date(Date.UTC(year, month, 1)).toISOString().slice(0, 10);
 }
 
 export function groupTenantsByStatus(tenants: TenantStatusItem[]): TenantStatusGroup[] {

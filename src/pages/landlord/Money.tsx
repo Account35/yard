@@ -1,12 +1,22 @@
 import { PageHeader } from "@/components/layout/PageHeader";
+import { Link } from "@tanstack/react-router";
+import { paths } from "@/router/paths";
 
 export default function Money() {
   return (
     <>
       <PageHeader title="Money" />
-      <p className="text-body text-ink-muted">
-        Charges, payments received and what is still owed will appear here.
-      </p>
+      <ul className="divide-y divide-line border-y border-line">
+        <li>
+          <Link
+            to={paths.utilityList}
+            className="flex min-h-14 items-center justify-between text-body text-ink underline"
+          >
+            Utilities
+            <span aria-hidden="true">›</span>
+          </Link>
+        </li>
+      </ul>
     </>
   );
 }

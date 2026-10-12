@@ -16,8 +16,10 @@ import { HowToPay } from "@/features/tenant-page/components/HowToPay";
 import { InvalidLink } from "@/features/tenant-page/components/InvalidLink";
 import { PaidForm } from "@/features/tenant-page/components/PaidForm";
 import { SubmissionsList } from "@/features/tenant-page/components/SubmissionsList";
-import { useTenantPaymentInfo } from "@/features/tenant-page/hooks";
+import { ChargesList } from "@/features/tenant-page/components/ChargesList";
+import { usePublicTenantCharges, useTenantPaymentInfo } from "@/features/tenant-page/hooks";
 import type { TenantPaymentInfo } from "@/types/domain";
+import type { PublicTenantCharge } from "@/features/tenant-page/charges";
 
 const previewTenant: PublicTenantPage = {
   tenant_name: "Ava Ndlovu",
@@ -58,6 +60,25 @@ const previewPaymentInfo: TenantPaymentInfo = {
   submissions: [],
 };
 
+const previewCharges: PublicTenantCharge[] = [
+  {
+    id: "rent-preview",
+    type: "rent",
+    period: "2026-10",
+    amountCents: 120_000,
+    dueDate: "2026-10-01",
+    note: null,
+  },
+  {
+    id: "electricity-preview",
+    type: "electricity",
+    period: "2026-10",
+    amountCents: 36_000,
+    dueDate: "2026-10-08",
+    note: "Your share of the R1 800 electricity bill for October 2026, split equally between 4 rooms and the main house.",
+  },
+];
+
 export default function TenantPage() {
   const { token = "" } = useParams({ strict: false });
   const preview = import.meta.env.DEV && token === "preview";
@@ -78,6 +99,7 @@ export default function TenantPage() {
   const tenantQuery = usePublicTenantPage(preview ? "" : token);
   const receiptsQuery = usePublicTenantReceipts(preview ? "" : token);
   const paymentInfoQuery = useTenantPaymentInfo(preview ? "" : token);
+  const chargesQuery = usePublicTenantCharges(preview ? "" : token);
   const tenant = preview ? previewTenant : tenantQuery.data;
   const receipts = preview ? previewReceipts : (receiptsQuery.data ?? []);
   const paymentInfo = preview ? previewPaymentInfo : paymentInfoQuery.data;
@@ -131,6 +153,11 @@ export default function TenantPage() {
                 ? daysLate(tenant.oldest_unpaid_due_date, todayInSA())
                 : 0
             }
+          />
+          <ChargesList
+            charges={preview ? previewCharges : (chargesQuery.data ?? [])}
+            isPending={!preview && chargesQuery.isPending}
+            isError={!preview && chargesQuery.isError}
           />
           <HowToPay info={paymentInfo} />
           {!preview && (
