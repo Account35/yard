@@ -5,6 +5,48 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      message_log: {
+        Row: {
+          id: string;
+          tenant_id: string;
+          kind: string;
+          payment_id: string | null;
+          language: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          tenant_id: string;
+          kind: string;
+          payment_id?: string | null;
+          language: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          tenant_id?: string;
+          kind?: string;
+          payment_id?: string | null;
+          language?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "message_log_tenant_id_fkey";
+            columns: ["tenant_id"];
+            isOneToOne: false;
+            referencedRelation: "tenants";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "message_log_payment_id_fkey";
+            columns: ["payment_id"];
+            isOneToOne: false;
+            referencedRelation: "payments";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       landlords: {
         Row: {
           id: string;
@@ -344,6 +386,7 @@ export type Database = {
           balance_after_cents: number;
         }[];
       };
+      // message_log has no database RPCs.
       regenerate_tenant_token: { Args: { p_tenant_id: string }; Returns: string };
       today_sa: { Args: Record<PropertyKey, never>; Returns: string };
       owns_tenant: { Args: { p_tenant_id: string }; Returns: boolean };

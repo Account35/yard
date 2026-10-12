@@ -181,3 +181,20 @@ Differences from the original Phase 0 brief, required by the framework:
   dates cannot be later than `todayInSA()`.
 - Receipt PDFs are generated with jsPDF only after a download or share action. Keep
   the receipt data type independent of database records for future tenant access.
+
+## WhatsApp messaging (Phase 5)
+
+- Migration `0007_message_log.sql` adds a landlord-owned append-only message log.
+  Apply it manually after `0006_tenant_portal_payments.sql`, then regenerate database
+  types locally after confirming the migration is applied.
+- Messages are composed from the English, isiZulu, isiXhosa, and Sesotho templates in
+  `features/messaging/templates.ts`. English is marked reviewed; other translations
+  must be checked by a native speaker before being treated as reviewed.
+- Reminder `{amount}` is the tenant's current outstanding balance, not the full rent.
+  Never imply that opening WhatsApp means a message was sent or delivered: log only
+  the landlord's action of opening the prepared WhatsApp link.
+- Do not automate or schedule sending. Preview the text and keep the landlord in control
+  of editing and sending it in WhatsApp.
+- Store landlord message language and reminder wording in the existing preference
+  fields. New tenants default to the landlord's saved language; tenants can retain their
+  own message language.

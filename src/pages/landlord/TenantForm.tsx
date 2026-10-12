@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useNavigate, useParams, useSearch } from "@tanstack/react-router";
 
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { useActiveRooms } from "@/features/rooms/hooks";
+import { useLandlord } from "@/features/auth/hooks";
 import {
   useCreateTenant,
   useCurrentTenants,
@@ -37,6 +38,8 @@ export default function TenantForm() {
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState("");
+  const landlord = useLandlord();
+  const initializedLanguage = useRef(false);
   const tenantQuery = useTenant(tenantId ?? "");
   const roomsQuery = useActiveRooms();
   const currentTenants = useCurrentTenants();
@@ -44,6 +47,13 @@ export default function TenantForm() {
   const updateTenant = useUpdateTenant();
   const tenant = tenantQuery.data ?? null;
   const isEditing = Boolean(tenantId);
+
+  useEffect(() => {
+    if (!isEditing && landlord.data && !initializedLanguage.current) {
+      initializedLanguage.current = true;
+      setValues((current) => ({ ...current, language: landlord.data?.language ?? "en" }));
+    }
+  }, [isEditing, landlord.data]);
 
   useEffect(() => {
     if (tenant) {
@@ -113,7 +123,10 @@ export default function TenantForm() {
             ...fields,
             access_token: crypto.randomUUID().replaceAll("-", ""),
           });
-      await navigate({ to: paths.tenantDetail.replace("$tenantId", saved.id) });
+      await navigate({
+        to: paths.tenantDetail.replace("$tenantId", saved.id),
+        ...(tenant ? {} : { search: { added: true } }),
+      });
     } catch (error) {
       setSubmitError(
         error instanceof Error

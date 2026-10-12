@@ -101,6 +101,14 @@ export default function Home() {
   return (
     <>
       <PageHeader title="Home" />
+      {groups.some((group) => group.status === "late") && (
+        <div className="mb-4">
+          <Button variant="secondary" onClick={() => void navigate({ to: paths.remind })}>
+            Remind late tenants (
+            {groups.find((group) => group.status === "late")?.tenants.length ?? 0})
+          </Button>
+        </div>
+      )}
       <MonthSummary
         period={period}
         collectedCents={monthSummary.collectedCents}

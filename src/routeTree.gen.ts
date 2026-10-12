@@ -16,6 +16,7 @@ import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as LandlordHomeRouteImport } from './routes/_landlord.home'
 import { Route as LandlordMoneyRouteImport } from './routes/_landlord.money'
+import { Route as LandlordRemindRouteImport } from './routes/_landlord.remind'
 import { Route as LandlordRoomsRouteImport } from './routes/_landlord.rooms'
 import { Route as LandlordSettingsRouteImport } from './routes/_landlord.settings'
 import { Route as DevKitRouteImport } from './routes/dev.kit'
@@ -58,6 +59,11 @@ const LandlordHomeRoute = LandlordHomeRouteImport.update({
 const LandlordMoneyRoute = LandlordMoneyRouteImport.update({
   id: '/money',
   path: '/money',
+  getParentRoute: () => LandlordRoute,
+} as any)
+const LandlordRemindRoute = LandlordRemindRouteImport.update({
+  id: '/remind',
+  path: '/remind',
   getParentRoute: () => LandlordRoute,
 } as any)
 const LandlordRoomsRoute = LandlordRoomsRouteImport.update({
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/home': typeof LandlordHomeRoute
   '/money': typeof LandlordMoneyRoute
+  '/remind': typeof LandlordRemindRoute
   '/rooms': typeof LandlordRoomsRouteWithChildren
   '/settings': typeof LandlordSettingsRoute
   '/dev/kit': typeof DevKitRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/home': typeof LandlordHomeRoute
   '/money': typeof LandlordMoneyRoute
+  '/remind': typeof LandlordRemindRoute
   '/rooms': typeof LandlordRoomsRouteWithChildren
   '/settings': typeof LandlordSettingsRoute
   '/dev/kit': typeof DevKitRoute
@@ -157,6 +165,7 @@ export interface FileRoutesById {
   '/sign-in': typeof SignInRoute
   '/_landlord/home': typeof LandlordHomeRoute
   '/_landlord/money': typeof LandlordMoneyRoute
+  '/_landlord/remind': typeof LandlordRemindRoute
   '/_landlord/rooms': typeof LandlordRoomsRouteWithChildren
   '/_landlord/settings': typeof LandlordSettingsRoute
   '/dev/kit': typeof DevKitRoute
@@ -176,6 +185,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/home'
     | '/money'
+    | '/remind'
     | '/rooms'
     | '/settings'
     | '/dev/kit'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/home'
     | '/money'
+    | '/remind'
     | '/rooms'
     | '/settings'
     | '/dev/kit'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/_landlord/home'
     | '/_landlord/money'
+    | '/_landlord/remind'
     | '/_landlord/rooms'
     | '/_landlord/settings'
     | '/dev/kit'
@@ -282,6 +294,13 @@ declare module '@tanstack/react-router' {
       path: '/money'
       fullPath: '/money'
       preLoaderRoute: typeof LandlordMoneyRouteImport
+      parentRoute: typeof LandlordRoute
+    }
+    '/_landlord/remind': {
+      id: '/_landlord/remind'
+      path: '/remind'
+      fullPath: '/remind'
+      preLoaderRoute: typeof LandlordRemindRouteImport
       parentRoute: typeof LandlordRoute
     }
     '/_landlord/rooms': {
@@ -392,6 +411,7 @@ const LandlordTenantsTenantIdRouteWithChildren =
 interface LandlordRouteChildren {
   LandlordHomeRoute: typeof LandlordHomeRoute
   LandlordMoneyRoute: typeof LandlordMoneyRoute
+  LandlordRemindRoute: typeof LandlordRemindRoute
   LandlordRoomsRoute: typeof LandlordRoomsRouteWithChildren
   LandlordSettingsRoute: typeof LandlordSettingsRoute
   LandlordTenantsTenantIdRoute: typeof LandlordTenantsTenantIdRouteWithChildren
@@ -401,6 +421,7 @@ interface LandlordRouteChildren {
 const LandlordRouteChildren: LandlordRouteChildren = {
   LandlordHomeRoute: LandlordHomeRoute,
   LandlordMoneyRoute: LandlordMoneyRoute,
+  LandlordRemindRoute: LandlordRemindRoute,
   LandlordRoomsRoute: LandlordRoomsRouteWithChildren,
   LandlordSettingsRoute: LandlordSettingsRoute,
   LandlordTenantsTenantIdRoute: LandlordTenantsTenantIdRouteWithChildren,

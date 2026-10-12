@@ -1,5 +1,5 @@
-import { useState, type ReactNode } from "react";
-import { Link, useNavigate, useParams } from "@tanstack/react-router";
+import { useEffect, useState, type ReactNode } from "react";
+import { Link, useNavigate, useParams, useSearch } from "@tanstack/react-router";
 
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
@@ -8,6 +8,11 @@ import { Statement } from "@/features/charges/components/Statement";
 import { daysLate, deriveStatus } from "@/features/charges/balance";
 import { useTenantBalances, useTenantCharges } from "@/features/charges/hooks";
 import { useTenantPayments } from "@/features/payments/hooks";
+import { MessageSheet, type MessageSheetMode } from "@/features/messaging/components/MessageSheet";
+import { LastMessageNote } from "@/features/messaging/components/LastMessageNote";
+import { latestMessageByTenantKind } from "@/features/messaging/reminders";
+import { useRecentMessageLog } from "@/features/messaging/hooks";
+import { useLandlord } from "@/features/auth/hooks";
 import { useRoom } from "@/features/rooms/hooks";
 import { MoveOutSheet } from "@/features/tenants/components/MoveOutSheet";
 import { useMoveOutTenant, useRegenerateTenantToken, useTenant } from "@/features/tenants/hooks";
@@ -20,19 +25,25 @@ import { LANGUAGE_LABELS } from "@/types/domain";
 
 export default function TenantDetail() {
   const { tenantId = "" } = useParams({ strict: false });
+  const search = useSearch({ strict: false });
   const navigate = useNavigate();
   const tenantQuery = useTenant(tenantId);
   const tenant = tenantQuery.data ?? null;
   const roomQuery = useRoom(tenant?.room_id ?? "");
+  const room = roomQuery.data ?? null;
   const balancesQuery = useTenantBalances();
   const chargesQuery = useTenantCharges(tenantId);
   const paymentsQuery = useTenantPayments(tenantId);
+  const messageLog = useRecentMessageLog();
+  const landlord = useLandlord();
   const moveOut = useMoveOutTenant();
   const regenerate = useRegenerateTenantToken();
   const [moveOutOpen, setMoveOutOpen] = useState(false);
   const [copyMessage, setCopyMessage] = useState("");
   const [actionError, setActionError] = useState("");
   const [tokenOverride, setTokenOverride] = useState<string | null>(null);
+  const [messageMode, setMessageMode] = useState<MessageSheetMode | null>(null);
+  const [welcomeCardVisible, setWelcomeCardVisible] = useState(false);
   const phone = tenant ? parseSAPhone(tenant.phone) : null;
   const phoneHref = tenant
     ? `tel:${phone?.ok ? phone.phone.e164 : tenant.phone.replace(/[^\d+]/g, "")}`
@@ -41,6 +52,18 @@ export default function TenantDetail() {
   const status = balance ? deriveStatus(balance) : "not_due";
   const daysOverdue =
     status === "late" && balance ? daysLate(balance.oldestUnpaidDueDate, todayInSA()) : 0;
+  const latestMessages = latestMessageByTenantKind(messageLog.data ?? []);
+
+  useEffect(() => {
+    if (search.added === true && tenant) {
+      setWelcomeCardVisible(true);
+      void navigate({
+        to: paths.tenantDetail.replace("$tenantId", tenant.id),
+        search: { added: undefined },
+        replace: true,
+      });
+    }
+  }, [navigate, search.added, tenant]);
 
   async function copyLink() {
     if (!tenant) return;
@@ -91,12 +114,9 @@ export default function TenantDetail() {
         <div className="space-y-6">
           <section className="space-y-3 rounded-md border border-line bg-surface p-4">
             <DetailLine label="Room">
-              {roomQuery.data ? (
-                <Link
-                  to={paths.roomDetail.replace("$roomId", roomQuery.data.id)}
-                  className="underline"
-                >
-                  {roomQuery.data.name}
+              {room ? (
+                <Link to={paths.roomDetail.replace("$roomId", room.id)} className="underline">
+                  {room.name}
                 </Link>
               ) : roomQuery.isPending ? (
                 "Loading"
@@ -110,12 +130,10 @@ export default function TenantDetail() {
             <DetailLine label="Move-in date">{formatShortDate(tenant.move_in_date)}</DetailLine>
             <DetailLine label="Deposit">{formatMoney(tenant.deposit_cents)}</DetailLine>
             <DetailLine label="Message language">{LANGUAGE_LABELS[tenant.language]}</DetailLine>
-            {roomQuery.data && (
+            {room && (
               <>
-                <DetailLine label="Monthly rent">
-                  {formatMoney(roomQuery.data.monthly_rent_cents)}
-                </DetailLine>
-                <DetailLine label="Rent due day">{roomQuery.data.due_day}</DetailLine>
+                <DetailLine label="Monthly rent">{formatMoney(room.monthly_rent_cents)}</DetailLine>
+                <DetailLine label="Rent due day">{room.due_day}</DetailLine>
               </>
             )}
             {tenant.move_out_date && (
@@ -135,7 +153,43 @@ export default function TenantDetail() {
               {copyMessage}
             </p>
           )}
+          {welcomeCardVisible && !tenant.move_out_date && (
+            <section className="space-y-3 rounded-md border border-line bg-surface p-4">
+              <p className="text-body text-ink">
+                Tenant added. Send them a welcome message with their personal link.
+              </p>
+              <Button
+                variant="secondary"
+                disabled={!room || !landlord.data}
+                onClick={() => {
+                  if (!room) return;
+                  setMessageMode({ kind: "welcome", tenant, room });
+                }}
+              >
+                Send welcome message
+              </Button>
+            </section>
+          )}
           <div className="flex flex-wrap gap-2">
+            {!balancesQuery.isPending &&
+              !balancesQuery.isError &&
+              room &&
+              balance &&
+              balance.balanceCents > 0 && (
+                <Button
+                  variant="secondary"
+                  onClick={() =>
+                    setMessageMode({
+                      kind: "reminder",
+                      tenant,
+                      room,
+                      balance,
+                    })
+                  }
+                >
+                  Remind
+                </Button>
+              )}
             {phoneHref && (
               <a
                 className="inline-flex min-h-12 items-center justify-center rounded-sm border border-line-strong bg-ground px-4 text-body font-semibold text-ink"
@@ -146,6 +200,14 @@ export default function TenantDetail() {
             )}
             {!tenant.move_out_date && (
               <>
+                {room && landlord.data && (
+                  <Button
+                    variant="secondary"
+                    onClick={() => setMessageMode({ kind: "welcome", tenant, room })}
+                  >
+                    Send welcome message
+                  </Button>
+                )}
                 <Button
                   onClick={() =>
                     void navigate({
@@ -179,6 +241,21 @@ export default function TenantDetail() {
                   Move out
                 </Button>
               </>
+            )}
+          </div>
+          <div className="space-y-1">
+            <LastMessageNote
+              entry={latestMessages.get(`${tenant.id}:reminder`)}
+              today={todayInSA()}
+            />
+            <LastMessageNote
+              entry={latestMessages.get(`${tenant.id}:welcome`)}
+              today={todayInSA()}
+            />
+            {messageLog.isError && (
+              <p role="alert" className="text-secondary text-ink">
+                Message history could not be loaded.
+              </p>
             )}
           </div>
           {!tenant.move_out_date && (
@@ -218,6 +295,20 @@ export default function TenantDetail() {
             </>
           )}
         </div>
+      )}
+      {tenant && room && landlord.data && messageMode && (
+        <MessageSheet
+          open={messageMode !== null}
+          onOpenChange={(open) => {
+            if (!open) setMessageMode(null);
+          }}
+          mode={messageMode}
+          landlord={landlord.data}
+          accessToken={tokenOverride ?? tenant.access_token}
+          onOpened={() => {
+            if (messageMode.kind === "welcome") setWelcomeCardVisible(false);
+          }}
+        />
       )}
     </>
   );

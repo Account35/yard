@@ -17,6 +17,10 @@ token-scoped RPCs for tenant balance/status and confirmed receipt history withou
 anonymous access to the underlying tables. Apply it manually before deploying the updated
 tenant page.
 
+Migration `0003_public_tenant_page.sql` was created by the platform and must not be edited
+or reused. Migration `0006_tenant_portal_payments.sql` was added outside the original
+phase prompts. The next migration is `0007_message_log.sql`; apply it after `0006`.
+
 - Name files with a four-digit number and a short name, for example `0001_core_tables.sql`.
 - Never edit an old migration. Every change is a new numbered file.
 - Changes are additive only: new tables, new nullable columns, or columns with a safe default.

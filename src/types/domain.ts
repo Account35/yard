@@ -20,6 +20,12 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
 
 export type Language = "en" | "zu" | "xh" | "st";
 export type ReminderTone = "friendly" | "firm";
+export type MessageKind = "welcome" | "reminder" | "receipt";
+export type MessageLogEntry = Omit<Tables["message_log"]["Row"], "kind" | "language"> & {
+  kind: MessageKind;
+  language: Language;
+};
+export type ReminderWording = ReminderTone;
 
 export const LANGUAGE_LABELS: Record<Language, string> = {
   en: "English",

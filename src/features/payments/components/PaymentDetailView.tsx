@@ -1,8 +1,12 @@
+import { useState } from "react";
+import type { ReactNode } from "react";
+
+import { Button } from "@/components/ui/Button";
+import { MessageSheet } from "@/features/messaging/components/MessageSheet";
 import { ProofViewer } from "@/features/payments/components/ProofViewer";
 import { ReceiptActions, type ReceiptContext } from "@/features/payments/components/ReceiptActions";
 import { VoidSheet } from "@/features/payments/components/VoidSheet";
 import { PAYMENT_METHOD_LABELS, type Payment, type StatementLine } from "@/types/domain";
-import type { ReactNode } from "react";
 import { formatShortDate } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 
@@ -38,6 +42,7 @@ export function PaymentDetailView({
   onVoidSheetOpenChange,
   onVoid,
 }: PaymentDetailViewProps) {
+  const [receiptMessageOpen, setReceiptMessageOpen] = useState(false);
   const line = statement.find((item) => item.kind === "payment" && item.id === payment.id);
   const isVoided = payment.status === "declined" && payment.voided_at !== null;
   const canManage = payment.status === "confirmed";
@@ -76,7 +81,28 @@ export function PaymentDetailView({
       )}
       {canManage && (
         <>
-          {receiptContext && <ReceiptActions context={receiptContext} />}
+          {receiptContext && (
+            <>
+              <div className="flex flex-wrap items-center gap-2">
+                <ReceiptActions context={receiptContext} />
+                <Button variant="secondary" onClick={() => setReceiptMessageOpen(true)}>
+                  Send receipt on WhatsApp
+                </Button>
+              </div>
+              <MessageSheet
+                open={receiptMessageOpen}
+                onOpenChange={setReceiptMessageOpen}
+                mode={{
+                  kind: "receipt",
+                  tenant: receiptContext.tenant,
+                  room: receiptContext.room,
+                  payment: receiptContext.payment,
+                }}
+                landlord={receiptContext.landlord}
+                accessToken={receiptContext.tenant.access_token}
+              />
+            </>
+          )}
           <button
             type="button"
             className="inline-flex min-h-11 items-center rounded-sm border border-line-strong bg-ground px-4 text-body font-semibold text-ink active:bg-line"

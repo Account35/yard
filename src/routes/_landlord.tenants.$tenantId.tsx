@@ -1,6 +1,9 @@
 import { createFileRoute, lazyRouteComponent } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_landlord/tenants/$tenantId")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    added: search["added"] === true ? true : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Tenant · Yard" },

@@ -12,6 +12,7 @@ export const paths = {
   tenantEdit: "/tenants/$tenantId/edit",
   recordPayment: "/tenants/$tenantId/payments/new",
   paymentDetail: "/tenants/$tenantId/payments/$paymentId",
+  remind: "/remind",
   tenant: "/t/$token",
   devKit: "/dev/kit",
   SIGN_IN: "/sign-in",

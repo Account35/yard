@@ -40,4 +40,8 @@ export const queryKeys = {
     month: (period: string) => ["payments", "month", period] as const,
     proofUrl: (path: string) => ["payments", "proof-url", path] as const,
   },
+  messaging: {
+    all: ["message-log"] as const,
+    recent: ["message-log", "recent"] as const,
+  },
 } as const;
