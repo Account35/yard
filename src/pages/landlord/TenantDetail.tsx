@@ -9,11 +9,13 @@ import { daysLate, deriveStatus } from "@/features/charges/balance";
 import { useTenantBalances, useTenantCharges } from "@/features/charges/hooks";
 import { useTenantPayments } from "@/features/payments/hooks";
 import { MessageSheet, type MessageSheetMode } from "@/features/messaging/components/MessageSheet";
+import { DownloadStatementButton } from "@/features/reports/components/DownloadStatementButton";
+import { buildTenantStatementLines } from "@/features/reports/aggregate";
 import { LastMessageNote } from "@/features/messaging/components/LastMessageNote";
 import { latestMessageByTenantKind } from "@/features/messaging/reminders";
 import { useRecentMessageLog } from "@/features/messaging/hooks";
 import { useLandlord } from "@/features/auth/hooks";
-import { useRoom } from "@/features/rooms/hooks";
+import { useProperty, useRoom } from "@/features/rooms/hooks";
 import { MoveOutSheet } from "@/features/tenants/components/MoveOutSheet";
 import { useMoveOutTenant, useRegenerateTenantToken, useTenant } from "@/features/tenants/hooks";
 import { formatShortDate, todayInSA } from "@/lib/dates";
@@ -31,11 +33,13 @@ export default function TenantDetail() {
   const tenant = tenantQuery.data ?? null;
   const roomQuery = useRoom(tenant?.room_id ?? "");
   const room = roomQuery.data ?? null;
+  const propertyQuery = useProperty();
   const balancesQuery = useTenantBalances();
   const chargesQuery = useTenantCharges(tenantId);
   const paymentsQuery = useTenantPayments(tenantId);
   const messageLog = useRecentMessageLog();
   const landlord = useLandlord();
+  const landlordPhone = landlord.data ? parseSAPhone(landlord.data.phone) : null;
   const moveOut = useMoveOutTenant();
   const regenerate = useRegenerateTenantToken();
   const [moveOutOpen, setMoveOutOpen] = useState(false);
@@ -291,6 +295,28 @@ export default function TenantDetail() {
                   payments={paymentsQuery.data ?? []}
                   readOnly={tenant.move_out_date !== null}
                 />
+                {room && landlord.data && propertyQuery.data && balance && (
+                  <DownloadStatementButton
+                    kind="tenant"
+                    fileSuffix={tenant.name}
+                    data={{
+                      generatedOn: todayInSA(),
+                      landlordName: landlord.data.name,
+                      landlordPhone: landlordPhone?.ok
+                        ? landlordPhone.phone.display
+                        : landlord.data.phone,
+                      propertyName: propertyQuery.data.name,
+                      propertyAddress: propertyQuery.data.address,
+                      tenantName: tenant.name,
+                      roomName: room.name,
+                      lines: buildTenantStatementLines(
+                        chargesQuery.data ?? [],
+                        paymentsQuery.data ?? [],
+                      ),
+                      closingBalanceCents: balance.balanceCents,
+                    }}
+                  />
+                )}
               </section>
             </>
           )}

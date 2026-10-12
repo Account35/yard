@@ -54,4 +54,9 @@ export const queryKeys = {
     readings: (type: string, roomIds: string[]) =>
       ["meter-readings", type, ...[...roomIds].sort()] as const,
   },
+  reports: {
+    all: ["reports"] as const,
+    income: ["reports", "income"] as const,
+    month: (month: string) => ["reports", "month", month] as const,
+  },
 } as const;

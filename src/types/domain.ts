@@ -162,3 +162,56 @@ export type OnboardingRoomInput = {
   monthly_rent_cents: number;
   due_day: number;
 };
+
+export type MonthlyIncomeRow = {
+  month: string;
+  chargedCents: number;
+  receivedCents: number;
+};
+
+export type MonthDetail = {
+  month: string;
+  chargedByType: Record<ChargeType, number>;
+  receivedByMethod: Record<PaymentMethod, number>;
+  payments: Array<{
+    paymentId: string;
+    tenantId: string;
+    paidOn: string;
+    tenantName: string;
+    roomName: string;
+    method: PaymentMethod;
+    amountCents: number;
+    receiptNumber: string;
+  }>;
+};
+
+export type OutstandingRow = {
+  tenantId: string;
+  tenantName: string;
+  roomName: string;
+  balanceCents: number;
+  daysLate: number | null;
+  isCurrent: boolean;
+};
+
+export type TenantStatementData = {
+  generatedOn: string;
+  landlordName: string;
+  landlordPhone: string;
+  propertyName: string;
+  propertyAddress: string | null;
+  tenantName: string;
+  roomName: string;
+  lines: StatementLine[];
+  closingBalanceCents: number;
+};
+
+export type MonthlyStatementData = {
+  generatedOn: string;
+  landlordName: string;
+  propertyName: string;
+  propertyAddress: string | null;
+  month: string;
+  detail: MonthDetail;
+  outstanding: OutstandingRow[];
+};

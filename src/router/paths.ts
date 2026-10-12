@@ -8,6 +8,8 @@ export const paths = {
   utilityList: "/money/utilities",
   utilityNew: "/money/utilities/new",
   utilityDetail: "/money/utilities/$billId",
+  incomeReport: "/money/income",
+  incomeMonth: "/money/income/$month",
   settings: "/settings",
   tenants: "/tenants",
   tenantNew: "/tenants/new",
