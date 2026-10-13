@@ -10,6 +10,10 @@ import { useProperty, useUpdatePropertyBankDetails } from "@/features/rooms/hook
 import { bankDetailsSchema } from "@/features/rooms/schema";
 import { useAuth } from "@/features/auth/useAuth";
 import { parseSAPhone } from "@/lib/phone";
+import {
+  DEFAULT_UPCOMING_REMINDER_DAYS,
+  UPCOMING_REMINDER_OPTIONS,
+} from "@/features/messaging/reminders";
 import { LANGUAGE_LABELS, type Language, type ReminderTone } from "@/types/domain";
 
 export default function Settings() {
@@ -17,7 +21,7 @@ export default function Settings() {
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const [signingOut, setSigningOut] = useState(false);
-  const [saved, setSaved] = useState<"language" | "wording" | null>(null);
+  const [saved, setSaved] = useState<"language" | "wording" | "upcoming" | null>(null);
   const [preferenceError, setPreferenceError] = useState("");
   const updatePreferences = useUpdateLandlordPreferences();
   const property = useProperty();
@@ -43,6 +47,19 @@ export default function Settings() {
       setSaved(key === "language" ? "language" : "wording");
     } catch {
       setPreferenceError("Your message preference could not be saved. Try again.");
+    }
+  }
+
+  async function saveUpcomingDays(days: number) {
+    setSaved(null);
+    setPreferenceError("");
+    try {
+      await updatePreferences.mutateAsync({ upcoming_reminder_days: days });
+      setSaved("upcoming");
+    } catch {
+      setPreferenceError(
+        "Your reminder setting could not be saved. Check that the latest database update was run in Supabase.",
+      );
     }
   }
 
@@ -109,6 +126,22 @@ export default function Settings() {
             ]}
           />
           {saved === "wording" && (
+            <p role="status" className="text-secondary text-ink">
+              Saved
+            </p>
+          )}
+          <Select
+            label="Upcoming rent reminder"
+            helper="Tenants who still owe are listed on Remind this many days before rent is due."
+            value={String(landlord.data.upcoming_reminder_days ?? DEFAULT_UPCOMING_REMINDER_DAYS)}
+            onChange={(event) => void saveUpcomingDays(Number(event.target.value))}
+            options={UPCOMING_REMINDER_OPTIONS.map((days) => ({
+              value: String(days),
+              label:
+                days === 0 ? "Off" : `${days} ${days === 1 ? "day" : "days"} before the due date`,
+            }))}
+          />
+          {saved === "upcoming" && (
             <p role="status" className="text-secondary text-ink">
               Saved
             </p>

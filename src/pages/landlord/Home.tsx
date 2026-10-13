@@ -13,6 +13,11 @@ import {
   type TenantStatusItem,
 } from "@/features/charges/balance";
 import { useMonthCharges, usePeriodPayments, useTenantBalances } from "@/features/charges/hooks";
+import { useLandlord } from "@/features/auth/hooks";
+import {
+  buildUpcomingReminderCandidates,
+  DEFAULT_UPCOMING_REMINDER_DAYS,
+} from "@/features/messaging/reminders";
 import { useActiveRooms } from "@/features/rooms/hooks";
 import { useCurrentTenants } from "@/features/tenants/hooks";
 import { usePendingPayments } from "@/features/payments/hooks";
@@ -21,6 +26,7 @@ import { paths } from "@/router/paths";
 
 export default function Home() {
   const navigate = useNavigate();
+  const landlord = useLandlord();
   const period = toPeriod(todayInSA());
   const tenants = useCurrentTenants();
   const rooms = useActiveRooms();
@@ -117,16 +123,31 @@ export default function Home() {
     ];
   });
   const groups = groupTenantsByStatus(statusItems);
+  const upcomingCount = buildUpcomingReminderCandidates(
+    currentTenants,
+    rooms.data ?? [],
+    balances.data ?? [],
+    [],
+    today,
+    landlord.data?.upcoming_reminder_days ?? DEFAULT_UPCOMING_REMINDER_DAYS,
+  ).length;
 
   return (
     <>
       <PageHeader title="Home" />
-      {groups.some((group) => group.status === "late") && (
-        <div className="mb-4">
-          <Button variant="secondary" onClick={() => void navigate({ to: paths.remind })}>
-            Remind late tenants (
-            {groups.find((group) => group.status === "late")?.tenants.length ?? 0})
-          </Button>
+      {(groups.some((group) => group.status === "late") || upcomingCount > 0) && (
+        <div className="mb-4 space-y-2">
+          {groups.some((group) => group.status === "late") && (
+            <Button variant="secondary" onClick={() => void navigate({ to: paths.remind })}>
+              Remind late tenants (
+              {groups.find((group) => group.status === "late")?.tenants.length ?? 0})
+            </Button>
+          )}
+          {upcomingCount > 0 && (
+            <Button variant="secondary" onClick={() => void navigate({ to: paths.remind })}>
+              Rent due soon ({upcomingCount})
+            </Button>
+          )}
         </div>
       )}
       <MonthSummary

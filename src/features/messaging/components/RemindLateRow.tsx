@@ -14,6 +14,8 @@ interface RemindLateRowProps {
   candidate: ReminderCandidate;
   landlord: Landlord;
   lastEntry?: MessageLogEntry;
+  /** Replaces the default "days late" line, used for upcoming reminders. */
+  detail?: string;
 }
 
 function dateInSA(timestamp: string): string {
@@ -27,7 +29,7 @@ function dateInSA(timestamp: string): string {
   return `${value("year")}-${value("month")}-${value("day")}`;
 }
 
-export function RemindLateRow({ candidate, landlord, lastEntry }: RemindLateRowProps) {
+export function RemindLateRow({ candidate, landlord, lastEntry, detail }: RemindLateRowProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const recordMessage = useRecordMessageOpened();
   const latest = lastEntry;
@@ -63,7 +65,8 @@ export function RemindLateRow({ candidate, landlord, lastEntry }: RemindLateRowP
           {candidate.tenant.name} · {candidate.room.name}
         </p>
         <p className="text-secondary text-ink">
-          Owes {formatMoney(candidate.balance.balanceCents)}, {candidate.daysLate} days late
+          {detail ??
+            `Owes ${formatMoney(candidate.balance.balanceCents)}, ${candidate.daysLate} days late`}
         </p>
         {when && <p className="text-secondary text-ink-muted">{when}</p>}
         {error && (

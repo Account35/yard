@@ -8,6 +8,8 @@ import { composeReminder, type ComposedMessage } from "@/features/messaging/comp
 import { useRecentMessageLog, useRecordMessageOpened } from "@/features/messaging/hooks";
 import {
   buildReminderCandidates,
+  buildUpcomingReminderCandidates,
+  DEFAULT_UPCOMING_REMINDER_DAYS,
   latestMessageByTenantKind,
   selectNextReminder,
   sortReminderCandidates,
@@ -16,7 +18,8 @@ import { firstName } from "@/features/messaging/render";
 import { buildWhatsAppUrl } from "@/features/messaging/whatsapp";
 import { useActiveRooms } from "@/features/rooms/hooks";
 import { useCurrentTenants } from "@/features/tenants/hooks";
-import { todayInSA } from "@/lib/dates";
+import { formatShortDate, todayInSA } from "@/lib/dates";
+import { formatMoney } from "@/lib/money";
 
 export default function RemindLate() {
   const landlord = useLandlord();
@@ -39,6 +42,19 @@ export default function RemindLate() {
       ),
     [tenants.data, rooms.data, balances.data, log.data, today],
   );
+  const upcomingDays = landlord.data?.upcoming_reminder_days ?? DEFAULT_UPCOMING_REMINDER_DAYS;
+  const upcoming = useMemo(
+    () =>
+      buildUpcomingReminderCandidates(
+        tenants.data ?? [],
+        rooms.data ?? [],
+        balances.data ?? [],
+        log.data ?? [],
+        today,
+        upcomingDays,
+      ),
+    [tenants.data, rooms.data, balances.data, log.data, today, upcomingDays],
+  );
   const sortedCandidates = sortReminderCandidates(candidates, today);
   const next = selectNextReminder(candidates, new Date());
   const latest = latestMessageByTenantKind(log.data ?? []);
@@ -46,7 +62,7 @@ export default function RemindLate() {
   if (queries.some((query) => query.isPending)) {
     return (
       <>
-        <PageHeader title="Late tenants" backTo="/home" />
+        <PageHeader title="Reminders" backTo="/home" />
         <p className="py-6 text-body text-ink-muted">Loading late tenants...</p>
       </>
     );
@@ -54,7 +70,7 @@ export default function RemindLate() {
   if (queries.some((query) => query.isError) || !landlord.data) {
     return (
       <>
-        <PageHeader title="Late tenants" backTo="/home" />
+        <PageHeader title="Reminders" backTo="/home" />
         <p role="alert" className="py-6 text-body text-ink">
           Late tenant details could not be loaded. Check your connection and try again.
         </p>
@@ -85,7 +101,39 @@ export default function RemindLate() {
 
   return (
     <>
-      <PageHeader title="Late tenants" backTo="/home" />
+      <PageHeader title="Reminders" backTo="/home" />
+      <section className="mb-6 space-y-2">
+        <h2 className="text-body font-semibold text-ink">Rent due soon</h2>
+        {upcomingDays === 0 ? (
+          <p className="text-secondary text-ink-muted">
+            Upcoming reminders are off. Turn them on in Settings.
+          </p>
+        ) : upcoming.length === 0 ? (
+          <p className="text-secondary text-ink-muted">
+            Nobody owes rent due in the next {upcomingDays} {upcomingDays === 1 ? "day" : "days"}.
+          </p>
+        ) : (
+          <ul className="divide-y divide-line border-y border-line">
+            {upcoming.map((candidate) => {
+              const lastEntry = latest.get(`${candidate.tenant.id}:reminder`);
+              const when =
+                candidate.daysUntilDue === 0
+                  ? "due today"
+                  : `due ${formatShortDate(candidate.dueDate)}, in ${candidate.daysUntilDue} ${candidate.daysUntilDue === 1 ? "day" : "days"}`;
+              return (
+                <RemindLateRow
+                  key={candidate.tenant.id}
+                  candidate={candidate}
+                  landlord={landlordData}
+                  detail={`Owes ${formatMoney(candidate.balance.balanceCents)}, ${when}`}
+                  {...(lastEntry ? { lastEntry } : {})}
+                />
+              );
+            })}
+          </ul>
+        )}
+      </section>
+      <h2 className="mb-2 text-body font-semibold text-ink">Late</h2>
       {candidates.length === 0 ? (
         <p className="py-6 text-body text-ink">Nobody is late right now.</p>
       ) : (

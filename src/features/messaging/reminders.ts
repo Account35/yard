@@ -150,7 +150,5 @@ export function buildUpcomingReminderCandidates(
         },
       ];
     })
-    .sort(
-      (a, b) => a.daysUntilDue - b.daysUntilDue || a.tenant.name.localeCompare(b.tenant.name),
-    );
+    .sort((a, b) => a.daysUntilDue - b.daysUntilDue || a.tenant.name.localeCompare(b.tenant.name));
 }
