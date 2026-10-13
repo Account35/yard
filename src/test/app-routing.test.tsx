@@ -25,4 +25,16 @@ describe("App routing", () => {
       "/_landlord/tenants/$tenantId/payments/$paymentId",
     );
   });
+
+  it("opens room, utility and income pages as their own pages", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+    const leaf = (p: string) => router.matchRoutes(p).at(-1)?.routeId;
+
+    expect(leaf("/rooms")).toBe("/_landlord/rooms/");
+    expect(leaf("/rooms/room-1")).toBe("/_landlord/rooms/$roomId");
+    expect(leaf("/money")).toBe("/_landlord/money/");
+    expect(leaf("/money/utilities")).toBe("/_landlord/money/utilities/");
+    expect(leaf("/money/utilities/new")).toBe("/_landlord/money/utilities/new");
+    expect(leaf("/money/income/2026-10")).toBe("/_landlord/money/income/$month");
+  });
 });
