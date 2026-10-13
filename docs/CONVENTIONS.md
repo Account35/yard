@@ -144,6 +144,7 @@ Differences from the original Phase 0 brief, required by the framework:
 - Allowed values: `landlords.language` is `en`, `zu`, `xh` or `st` (English, isiZulu,
   isiXhosa, Sesotho; used for WhatsApp messages, app screens stay English).
   `landlords.reminder_tone` is `friendly` or `firm`.
+- `landlords.upcoming_reminder_days` is 0 (off), 1, 2, 3, 5 or 7.
 - Rooms are never deleted (no delete policy); set `is_active = false` instead.
 - The onboarding draft lives in localStorage under `yard.onboarding.draft`.
 

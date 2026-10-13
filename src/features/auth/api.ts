@@ -50,7 +50,7 @@ export async function fetchLandlord(userId: string): Promise<Landlord | null> {
 
 export async function updateLandlordPreferences(
   landlordId: string,
-  preferences: { language?: Language; reminder_tone?: ReminderTone },
+  preferences: { language?: Language; reminder_tone?: ReminderTone; upcoming_reminder_days?: number },
 ): Promise<void> {
   const { error } = await supabase.from("landlords").update(preferences).eq("id", landlordId);
   if (error) throw error;

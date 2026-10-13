@@ -54,6 +54,7 @@ export type Database = {
           phone: string;
           language: string;
           reminder_tone: string;
+          upcoming_reminder_days: number;
           onboarding_completed_at: string | null;
           created_at: string;
         };
@@ -63,6 +64,7 @@ export type Database = {
           phone: string;
           language?: string;
           reminder_tone?: string;
+          upcoming_reminder_days?: number;
           onboarding_completed_at?: string | null;
           created_at?: string;
         };
@@ -72,6 +74,7 @@ export type Database = {
           phone?: string;
           language?: string;
           reminder_tone?: string;
+          upcoming_reminder_days?: number;
           onboarding_completed_at?: string | null;
           created_at?: string;
         };
