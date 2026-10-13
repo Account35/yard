@@ -6,7 +6,7 @@ import { Sheet } from "@/components/ui/Sheet";
 import { todayInSA } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 
-import { moveOutDateError } from "../moveOut";
+import { defaultMoveOutDate, moveOutDateError } from "../moveOut";
 
 interface MoveOutSheetProps {
   open: boolean;
@@ -25,23 +25,22 @@ export function MoveOutSheet({
   balanceCents,
   onConfirm,
 }: MoveOutSheetProps) {
-  const today = todayInSA();
-  const [date, setDate] = useState(today);
+  const [date, setDate] = useState(() => defaultMoveOutDate(moveInDate, todayInSA()));
   const [error, setError] = useState("");
   const [submitError, setSubmitError] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setDate(todayInSA());
+      setDate(defaultMoveOutDate(moveInDate, todayInSA()));
       setError("");
       setSubmitError("");
     }
-  }, [open]);
+  }, [open, moveInDate]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const message = moveOutDateError(date, moveInDate, today);
+    const message = moveOutDateError(date, moveInDate);
     if (message) {
       setError(message);
       return;
@@ -70,7 +69,6 @@ export function MoveOutSheet({
           label="Move-out date"
           type="date"
           min={moveInDate}
-          max={today}
           value={date}
           onChange={(event) => {
             setDate(event.target.value);
