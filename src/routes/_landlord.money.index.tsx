@@ -1,6 +1,6 @@
 import { createFileRoute, lazyRouteComponent } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_landlord/money")({
+export const Route = createFileRoute("/_landlord/money/")({
   head: () => ({
     meta: [
       { title: "Money · Yard" },
