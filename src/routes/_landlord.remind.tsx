@@ -3,8 +3,8 @@ import { createFileRoute, lazyRouteComponent } from "@tanstack/react-router";
 export const Route = createFileRoute("/_landlord/remind")({
   head: () => ({
     meta: [
-      { title: "Remind late tenants · Yard" },
-      { name: "description", content: "Review rent reminders for late tenants." },
+      { title: "Rent reminders · Yard" },
+      { name: "description", content: "Send WhatsApp reminders for rent due soon and late rent." },
     ],
   }),
   component: lazyRouteComponent(() => import("@/pages/landlord/RemindLate")),

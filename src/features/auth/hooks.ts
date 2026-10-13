@@ -21,7 +21,11 @@ export function useUpdateLandlordPreferences() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   return useMutation({
-    mutationFn: (preferences: { language?: Language; reminder_tone?: ReminderTone }) => {
+    mutationFn: (preferences: {
+      language?: Language;
+      reminder_tone?: ReminderTone;
+      upcoming_reminder_days?: number;
+    }) => {
       if (!user?.id) throw new Error("Sign in to update your message preferences");
       return updateLandlordPreferences(user.id, preferences);
     },
