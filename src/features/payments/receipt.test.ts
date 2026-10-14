@@ -58,6 +58,7 @@ const landlord: Landlord = {
   phone: "+27821234567",
   language: "en",
   reminder_tone: "friendly",
+    upcoming_reminder_days: 3,
   onboarding_completed_at: "2026-01-01T00:00:00.000Z",
   created_at: "2026-01-01T00:00:00.000Z",
 };
