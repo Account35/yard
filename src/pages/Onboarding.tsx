@@ -85,6 +85,7 @@ export default function Onboarding() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-6 px-gutter pt-12 pb-[calc(32px+env(safe-area-inset-bottom))]">
       <div className="flex flex-col gap-1">
+        <p className="text-body font-semibold text-ink">Yard</p>
         <p className="text-secondary text-ink-muted">Step {step} of 3</p>
         <h1 className="text-title font-semibold text-ink">Set up Yard</h1>
       </div>

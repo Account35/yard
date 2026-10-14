@@ -245,3 +245,19 @@ Differences from the original Phase 0 brief, required by the framework:
   South African calendar month, regardless of the charge period.
 - The public `tenant_charges(token)` function returns only the tenant's recent charges.
   Tenants do not get direct access to charges, utility bills, or meter-reading tables.
+
+## Landing page (Phase 8.1)
+
+- A signed-out visitor opening `/` sees the public landing page. The root waits for auth
+  and landlord onboarding state; onboarded landlords go to `/home`, and landlords who
+  have not finished onboarding go to `/onboarding`. Other guarded routes keep their
+  existing sign-in redirect behaviour. The installed app continues to start at `/home`.
+- Keep the landing copy plain, accurate and free of exclamation marks. Do not claim
+  prices, supported languages, or other capabilities that are not available and verified.
+- `LEGAL_PAGES_READY` in `src/config.ts` remains false until the Privacy and Terms pages
+  have been written and reviewed. Do not show their links while it is false.
+- The landing page must remain a lazy route chunk and must not import landlord-only
+  features. Its gzip budget is checked by `npm run perf:check`.
+- Use `VITE_PUBLIC_APP_URL` only when it is configured. Canonical and social preview
+  metadata and the root-only sitemap are omitted otherwise. `public/robots.txt` allows
+  `/` and excludes tenant and signed-in application paths from crawlers.

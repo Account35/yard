@@ -1,5 +1,6 @@
 /** Every route path in the app. */
 export const paths = {
+  landing: "/",
   root: "/",
   home: "/home",
   rooms: "/rooms",
