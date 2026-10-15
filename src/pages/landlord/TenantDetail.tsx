@@ -299,6 +299,7 @@ export default function TenantDetail() {
                   <DownloadStatementButton
                     kind="tenant"
                     fileSuffix={tenant.name}
+                    label="View statement"
                     data={{
                       generatedOn: todayInSA(),
                       landlordName: landlord.data.name,

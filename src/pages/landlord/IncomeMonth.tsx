@@ -142,7 +142,7 @@ function MonthPageBody({
         kind="monthly"
         data={statementData}
         fileSuffix={month}
-        label="Download statement (PDF)"
+        label="View statement"
       />
     </div>
   );

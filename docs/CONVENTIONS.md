@@ -182,6 +182,10 @@ Differences from the original Phase 0 brief, required by the framework:
   dates cannot be later than `todayInSA()`.
 - Receipt PDFs are generated with jsPDF only after a download or share action. Keep
   the receipt data type independent of database records for future tenant access.
+- Landlord receipts and statements open in an in-app sheet preview first; PDF download
+  and native file sharing are explicit actions. Tenant proof images and PDFs preview
+  in the same sheet with a separate download action. Native file sharing may offer
+  WhatsApp, but Yard must not claim to send files directly through WhatsApp.
 
 ## WhatsApp messaging (Phase 5)
 
