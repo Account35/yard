@@ -46,7 +46,7 @@ export function VoidSheet({ open, saving, onOpenChange, onVoid }: VoidSheetProps
           onChange={(event) => setReason(event.target.value)}
           error={error}
         />
-        <Button fullWidth variant="secondary" loading={saving} loadingLabel="Voiding">
+        <Button fullWidth type="submit" variant="secondary" loading={saving} loadingLabel="Voiding">
           Void payment
         </Button>
       </form>

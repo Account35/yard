@@ -106,7 +106,7 @@ export function ConfirmSheet({
             {error}
           </p>
         )}
-        <Button fullWidth loading={saving} loadingLabel="Confirming">
+        <Button fullWidth type="submit" loading={saving} loadingLabel="Confirming">
           Confirm payment
         </Button>
       </form>
