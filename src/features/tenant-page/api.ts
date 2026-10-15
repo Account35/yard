@@ -172,11 +172,7 @@ export async function submitTenantPayment(input: {
   method: PaymentMethod;
   proof: File | null;
 }): Promise<void> {
-  const form = new FormData();
-  form.set("token", input.token);
-  form.set("amount_cents", String(input.amountCents));
-  form.set("paid_on", input.paidOn);
-  form.set("method", input.method);
+  let proofPath: string | null = null;
   if (input.proof) {
     const { prepareProof } = await import("@/features/payments/proof");
     const prepared = await prepareProof(input.proof);
@@ -186,28 +182,34 @@ export async function submitTenantPayment(input: {
     if (prepared.contentType === "application/pdf" && prepared.blob.size > 2 * 1024 * 1024) {
       throw new TenantNoticeError("Choose a PDF under 2 MB.", "file_size");
     }
-    form.set("proof", prepared.blob, `proof.${prepared.extension}`);
+    const folder = await supabase.rpc("tenant_proof_folder", { p_token: input.token });
+    if (folder.error) throw new TenantNoticeError(errorMessage("server"), "server");
+    if (typeof folder.data !== "string" || folder.data === "") {
+      throw new TenantNoticeError(errorMessage("invalid_link"), "invalid_link");
+    }
+    proofPath = `${folder.data}/${crypto.randomUUID()}.${prepared.extension}`;
+    const upload = await supabase.storage
+      .from("payment-proofs")
+      .upload(proofPath, prepared.blob, { contentType: prepared.contentType, upsert: false });
+    if (upload.error) {
+      console.error("Tenant proof upload failed.", upload.error);
+      throw new TenantNoticeError(errorMessage("server"), "server");
+    }
   }
 
-  const { VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY } = requireEnv();
-  let result: Response;
-  try {
-    result = await fetch(`${VITE_SUPABASE_URL}/functions/v1/tenant-payment`, {
-      method: "POST",
-      headers: { apikey: VITE_SUPABASE_ANON_KEY },
-      body: form,
-    });
-  } catch {
+  const { data, error } = await supabase.rpc("submit_tenant_payment", {
+    p_token: input.token,
+    p_amount_cents: input.amountCents,
+    p_paid_on: input.paidOn,
+    p_method: input.method,
+    p_proof_path: proofPath,
+  });
+  if (error) {
+    console.error("Tenant payment notice failed.", error);
     throw new TenantNoticeError(errorMessage("server"), "server");
   }
-  let body: unknown;
-  try {
-    body = await result.json();
-  } catch {
-    throw new TenantNoticeError(errorMessage("server"), "server");
-  }
-  if (!result.ok || !isRecord(body) || body["ok"] !== true) {
-    const code = isRecord(body) && isNoticeErrorCode(body["code"]) ? body["code"] : "server";
+  if (data !== "ok") {
+    const code = isNoticeErrorCode(data) ? data : "server";
     throw new TenantNoticeError(errorMessage(code), code);
   }
 }
