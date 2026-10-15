@@ -48,7 +48,13 @@ export function DeclineSheet({
           onChange={(event) => setReason(event.target.value)}
           error={error}
         />
-        <Button fullWidth variant="secondary" loading={saving} loadingLabel="Declining">
+        <Button
+          fullWidth
+          type="submit"
+          variant="secondary"
+          loading={saving}
+          loadingLabel="Declining"
+        >
           Decline payment
         </Button>
       </form>
