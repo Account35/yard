@@ -507,6 +507,20 @@ export type Database = {
         Args: { p_token: string };
         Returns: Json;
       };
+      tenant_proof_folder: {
+        Args: { p_token: string };
+        Returns: string | null;
+      };
+      submit_tenant_payment: {
+        Args: {
+          p_token: string;
+          p_amount_cents: number;
+          p_paid_on: string;
+          p_method: string;
+          p_proof_path: string | null;
+        };
+        Returns: string;
+      };
       confirm_pending_payment: {
         Args: {
           p_payment_id: string;
