@@ -33,15 +33,30 @@
   --color-status-neutral: #6b6b6b;
   --color-backdrop: rgb(0 0 0 / 0.4);
 
+  /* Design rules v2: tints and status ink. Mirrored in src/styles/tokens.ts. */
+  --color-brand-tint: #e6efe9;
+  --color-neutral-tint: #eeeeea;
+  --color-on-brand-muted: #c9d9cf;
+  --color-status-paid-ink: #1f5f3f;
+  --color-status-paid-tint: #e6efe9;
+  --color-status-part-tint: #f6ebd5;
+  --color-status-part-ink-v2: #7a4f0a;
+  --color-status-late-ink: #8f2e2e;
+  --color-status-late-tint: #f4e1e1;
+  --color-status-neutral-ink: #4f4f4f;
+  --color-status-neutral-tint: #eeeeea;
+
   --font-sans: "Inter", system-ui, sans-serif;
 
-  /* Exactly three type sizes. */
+  /* Four type sizes: 14, 16, 20, 28. */
   --text-secondary: 14px;
   --text-secondary--line-height: 20px;
   --text-body: 16px;
   --text-body--line-height: 24px;
-  --text-title: 24px;
-  --text-title--line-height: 32px;
+  --text-title: 20px;
+  --text-title--line-height: 28px;
+  --text-figure: 28px;
+  --text-figure--line-height: 36px;
 
   --radius-sm: 4px;
   --radius-md: 8px;

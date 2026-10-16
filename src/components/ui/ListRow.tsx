@@ -7,31 +7,52 @@ export interface ListRowProps {
   primary: ReactNode;
   secondary?: ReactNode;
   trailing?: ReactNode;
+  /** 40px leading slot: IconTile or InitialsTile. */
+  leading?: ReactNode;
   chevron?: boolean;
   onClick?: () => void;
+  /** One phrase a screen reader reads for the whole row. */
+  summary?: string;
 }
 
-/** Place ListRows inside a <ul className="divide-y divide-line">. */
-export function ListRow({ primary, secondary, trailing, chevron = false, onClick }: ListRowProps) {
+/** Three-column row: leading tile, content, right-aligned trailing column. */
+export function ListRow({
+  primary,
+  secondary,
+  trailing,
+  leading,
+  chevron = false,
+  onClick,
+  summary,
+}: ListRowProps) {
   const content = (
     <>
-      <span className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-body text-ink">{primary}</span>
-        {secondary !== undefined && (
+      {leading !== undefined && (
+        <span className="flex w-10 shrink-0 justify-center" aria-hidden={summary ? true : undefined}>
+          {leading}
+        </span>
+      )}
+      <span className="flex min-w-0 flex-1 flex-col" aria-hidden={summary ? true : undefined}>
+        <span className="truncate text-body font-semibold text-ink">{primary}</span>
+        {secondary !== undefined && secondary !== "" && (
           <span className="truncate text-secondary text-ink-muted">{secondary}</span>
         )}
       </span>
-      {trailing !== undefined && <span className="shrink-0 text-body">{trailing}</span>}
-      {chevron && (
-        <ChevronRight
-          aria-hidden="true"
-          className="size-5 shrink-0 text-ink-muted"
-          strokeWidth={1.5}
-        />
+      {trailing !== undefined && (
+        <span
+          className="flex min-w-24 shrink-0 flex-col items-end gap-1 text-right text-body"
+          aria-hidden={summary ? true : undefined}
+        >
+          {trailing}
+        </span>
       )}
+      {chevron && (
+        <ChevronRight aria-hidden="true" className="size-5 shrink-0 text-ink-muted" strokeWidth={1.75} />
+      )}
+      {summary && <span className="sr-only">{summary}</span>}
     </>
   );
-  const base = "flex min-h-14 w-full items-center gap-3 py-2 text-left";
+  const base = "flex min-h-16 w-full items-center gap-3 px-4 py-2 text-left";
 
   return (
     <li className="list-none">
@@ -43,5 +64,14 @@ export function ListRow({ primary, secondary, trailing, chevron = false, onClick
         <div className={base}>{content}</div>
       )}
     </li>
+  );
+}
+
+/** White bordered list card that holds ListRows. */
+export function ListCard({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <ul className={cn("divide-y divide-line overflow-hidden rounded-md border border-line bg-surface", className)}>
+      {children}
+    </ul>
   );
 }
