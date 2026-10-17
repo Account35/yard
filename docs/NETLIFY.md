@@ -8,8 +8,9 @@
 
 ## Environment variables
 
-Yard needs two variables at build time. In Netlify open
-**Site configuration > Environment variables > Add a variable** and add:
+The project's public Supabase URL and anon key are built in as defaults
+(`src/lib/env.ts`), so no variables are required. To point a build at a different
+Supabase project, open **Site configuration > Environment variables > Add a variable** and add:
 
 | Key                      | Value                                                   |
 | ------------------------ | ------------------------------------------------------- |

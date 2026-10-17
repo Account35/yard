@@ -1,4 +1,4 @@
-import { useRouter } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 import { CodeStep } from "@/features/auth/components/CodeStep";
@@ -25,7 +25,11 @@ export default function SignIn({ redirect }: { redirect?: string | undefined }) 
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-6 px-gutter pt-16 pb-safe">
-      <p className="text-body font-semibold text-brand">Yard</p>
+      <header>
+        <Link to={paths.landing} className="text-body font-semibold text-ink underline">
+          Yard
+        </Link>
+      </header>
       <h1 className="text-title font-semibold text-ink">Sign in</h1>
       {phone ? (
         <CodeStep

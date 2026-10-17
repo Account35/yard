@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import type { Landlord } from "@/types/domain";
+import type { Landlord, Language, ReminderTone } from "@/types/domain";
 
 export const OFFLINE_MESSAGE = "You are offline. Connect to the internet to sign in.";
 
@@ -46,4 +46,12 @@ export async function fetchLandlord(userId: string): Promise<Landlord | null> {
     .maybeSingle();
   if (error) throw error;
   return data as Landlord | null;
+}
+
+export async function updateLandlordPreferences(
+  landlordId: string,
+  preferences: { language?: Language; reminder_tone?: ReminderTone; upcoming_reminder_days?: number },
+): Promise<void> {
+  const { error } = await supabase.from("landlords").update(preferences).eq("id", landlordId);
+  if (error) throw error;
 }

@@ -128,6 +128,16 @@ Differences from the original Phase 0 brief, required by the framework:
 - Tap targets at least 44px; buttons 48px high. No red button: destructive actions use
   the secondary variant with clear wording.
 - Plain human copy, no exclamation marks.
+- Prefer the shared visual primitives (`InitialsTile`, `IconTile`, `RowAmount`,
+  `SummaryPanel`, `SectionHeader`, `ListCard`, `ActionTile`, `FeatureCard`, `StepFlow`,
+  and `LedgerTable`) over one-off equivalents. Keep `ListRow` items directly inside a
+  `ListCard`; do not nest list items. Use a screen-reader summary when visual row content
+  is hidden from assistive technology.
+- Status tags use the matching tinted background, darker text and a labelled dot. Never
+  rely on the dot or colour alone to communicate payment status.
+- Use the 20px title and 28px figure tokens for prominent content; monetary figures use
+  tabular numerals. Keep dashboard setup steps visible until rooms, tenants and a confirmed
+  payment are all present.
 
 ## Auth and onboarding (Phase 1)
 
@@ -144,5 +154,124 @@ Differences from the original Phase 0 brief, required by the framework:
 - Allowed values: `landlords.language` is `en`, `zu`, `xh` or `st` (English, isiZulu,
   isiXhosa, Sesotho; used for WhatsApp messages, app screens stay English).
   `landlords.reminder_tone` is `friendly` or `firm`.
+- `landlords.upcoming_reminder_days` is 0 (off), 1, 2, 3, 5 or 7.
 - Rooms are never deleted (no delete policy); set `is_active = false` instead.
 - The onboarding draft lives in localStorage under `yard.onboarding.draft`.
+
+## Charges and payments (Phase 3)
+
+- Migration `0004_charges_and_balances.sql` adds landlord-owned `charges` and `payments`,
+  the `tenant_balances` view, and the `generate_rent_charges()` RPC. Migration `0003`
+  remains reserved for the public tenant page and must not be reused.
+- Money remains integer cents. Charge periods are `YYYY-MM`; due and paid dates are
+  `YYYY-MM-DD`. Rent generation must be safe to call repeatedly and is triggered when
+  the landlord area loads and after tenant changes.
+- Confirmed payments reduce tenant balances. Pending-confirmation payments appear in
+  statements but do not reduce balances; declined payments are excluded from balances
+  and statements.
+- Rent status is derived from the tenant balance: paid (zero or credit), late (positive
+  overdue amount), part paid (current-period payment with an amount still owed), or not
+  due. A status colour always appears with its text label.
+- Statements combine charges and payments in date order with a running balance.
+  Moved-out tenant statements are read-only. Charge edits update the amount and note;
+  payment entry and reconciliation are out of scope for Phase 3.
+- Dashboard summaries use the current South African month and include collected,
+  expected, and outstanding amounts. Tenant status groups link to tenant details.
+
+## Payments and receipts (Phase 4)
+
+- Landlord-recorded payments are confirmed and receive a sequential per-landlord
+  receipt number in the database. Confirmed payments are immutable; correcting one
+  means voiding it with a reason and recording a replacement.
+- Voided payments have `status = declined`, `voided_at`, and `void_reason`. A declined
+  payment without `voided_at` is a rejected tenant claim and is not shown in the
+  landlord statement.
+- Payment proof files are stored in the private `payment-proofs` bucket by storage
+  path, never as public URLs. Use short-lived signed URLs to display proofs.
+- Compress images on-device before upload; PDFs may be uploaded unchanged. Payment
+  dates cannot be later than `todayInSA()`.
+- Receipt PDFs are generated with jsPDF only after a download or share action. Keep
+  the receipt data type independent of database records for future tenant access.
+- Landlord receipts and statements open in an in-app sheet preview first; PDF download
+  and native file sharing are explicit actions. Tenant proof images and PDFs preview
+  in the same sheet with a separate download action. Native file sharing may offer
+  WhatsApp, but Yard must not claim to send files directly through WhatsApp.
+
+## WhatsApp messaging (Phase 5)
+
+- Migration `0007_message_log.sql` adds a landlord-owned append-only message log.
+  Apply it manually after `0006_tenant_portal_payments.sql`, then regenerate database
+  types locally after confirming the migration is applied.
+- Messages are composed from the English, isiZulu, isiXhosa, and Sesotho templates in
+  `features/messaging/templates.ts`. English is marked reviewed; other translations
+  must be checked by a native speaker before being treated as reviewed.
+- Reminder `{amount}` is the tenant's current outstanding balance, not the full rent.
+  Never imply that opening WhatsApp means a message was sent or delivered: log only
+  the landlord's action of opening the prepared WhatsApp link.
+- Do not automate or schedule sending. Preview the text and keep the landlord in control
+  of editing and sending it in WhatsApp.
+- Store landlord message language and reminder wording in the existing preference
+  fields. New tenants default to the landlord's saved language; tenants can retain their
+  own message language.
+
+## Tenant payment notices (Phase 6)
+
+- Apply `0008_tenant_payments.sql` manually after `0007_message_log.sql`. It adds only
+  `payments.decline_reason`, indexes and functions; it creates no new table.
+- Tenants never read or write database tables directly. Public reads use token-scoped
+  `SECURITY DEFINER` functions that select only the current tenant's safe data. Payment
+  notices are written only through the public `tenant-payment` Edge Function.
+- The Edge Function requires `ALLOWED_ORIGINS` for deployed browser origins and uses
+  `SUPABASE_SERVICE_ROLE_KEY` only in its own function environment. Keep JWT verification
+  disabled only for this function. Never put a service-role key in frontend code.
+- A tenant payment row has `created_by = 'tenant'` and starts as
+  `pending_confirmation`; it never reduces a balance. Landlords confirm through
+  `confirm_pending_payment`, which assigns a receipt via the existing trigger, or decline
+  through `decline_pending_payment`. A declined notice is final; the tenant can submit a
+  new notice.
+- The Edge Function enforces no more than five notices per rolling 24 hours, three
+  waiting notices, and no duplicate amount/date among waiting notices. Amounts are
+  positive and capped at R50,000; dates are today in South Africa or within the preceding
+  90 days. It sniffs proof bytes and permits JPEG, PNG, WebP and PDF only; compressed
+  images are limited to 1 MB and PDFs to 2 MB.
+- Payment instructions are stored on the landlord's property and are visible to anyone
+  with a tenant link. Keep them to 500 characters and tell landlords this when saving.
+- Tenant pages expose only that tenant's payment instructions and up to ten of their
+  pending or recent declined notices. Pending notices do not change the displayed
+  balance; declined reasons are visible to that tenant for 30 days.
+
+## Utilities (Phase 7)
+
+- Apply `0009_utilities.sql` manually after `0008_tenant_payments.sql`. It adds utility
+  bill snapshots, room meter readings, a nullable utility-bill link on charges, and the
+  `create_utility_bill`, `void_utility_bill`, and token-scoped `tenant_charges` functions.
+- Utility bill types are electricity and water; usage is integer thousandths of kWh or kL.
+  Money remains integer cents. Allocate integer amounts with the largest-remainder
+  method and `BigInt` intermediate multiplication; tie remainders follow natural room
+  name order. Shares plus the uncharged main-house amount must equal the bill total.
+- Only rooms with current tenants may be charged. Vacant rooms are not selectable.
+  Bills are immutable snapshots. Undo within 14 days deletes the linked charges and
+  saved room readings and marks the bill undone; after that, correct individual charges
+  from the tenant statement.
+- A utility charge keeps its English calculation note. Statements label charges by type
+  and period (for example, “Electricity, October 2026”) and show that note underneath.
+- “Expected this month” means the sum of charges whose `due_date` falls in the current
+  South African calendar month, regardless of the charge period.
+- The public `tenant_charges(token)` function returns only the tenant's recent charges.
+  Tenants do not get direct access to charges, utility bills, or meter-reading tables.
+
+## Landing page (Phase 8.1)
+
+- A signed-out visitor opening `/` sees the public landing page. The root waits for auth
+  and landlord onboarding state; onboarded landlords go to `/home`, and landlords who
+  have not finished onboarding go to `/onboarding`. Other guarded routes keep their
+  existing sign-in redirect behaviour. The installed app continues to start at `/home`.
+- Keep the landing copy plain, accurate and free of exclamation marks. Do not claim
+  prices, supported languages, or other capabilities that are not available and verified.
+- `LEGAL_PAGES_READY` in `src/config.ts` remains false until the Privacy and Terms pages
+  have been written and reviewed. Do not show their links while it is false.
+- The landing page must remain a lazy route chunk and must not import landlord-only
+  features. Its gzip budget is checked by `npm run perf:check`.
+- Use `VITE_PUBLIC_APP_URL` only when it is configured. Canonical and social preview
+  metadata and the root-only sitemap are omitted otherwise. `public/robots.txt` allows
+  `/` and excludes tenant and signed-in application paths from crawlers.

@@ -1,8 +1,10 @@
 import { Outlet } from "@tanstack/react-router";
 
 import { BottomNav } from "@/components/ui/BottomNav";
+import { useGenerateRentChargesOnMount } from "@/features/charges/hooks";
 
 export function AppShell() {
+  useGenerateRentChargesOnMount();
   return (
     <div className="min-h-dvh pt-safe">
       {/* Bottom padding keeps content clear of the nav (56px) plus the safe area. */}
