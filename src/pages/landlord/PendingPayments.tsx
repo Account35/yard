@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
+import { ListCard } from "@/components/ui/ListRow";
 import { PendingRow } from "@/features/payments/components/PendingRow";
 import { usePendingPayments } from "@/features/payments/hooks";
 import { paths } from "@/router/paths";
@@ -40,11 +41,11 @@ export default function PendingPayments() {
       {pending.data.length === 0 ? (
         <p className="py-6 text-body text-ink">Nothing waiting.</p>
       ) : (
-        <ul className="divide-y divide-line border-y border-line">
+        <ListCard>
           {pending.data.map((row) => (
             <PendingRow key={row.paymentId} row={row} />
           ))}
-        </ul>
+        </ListCard>
       )}
       <Link
         className="mt-5 inline-flex min-h-11 items-center text-body text-ink underline"

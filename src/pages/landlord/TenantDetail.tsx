@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams, useSearch } from "@tanstack/react-router"
 
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
+import { InitialsTile } from "@/components/ui/InitialsTile";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { BalanceBlock } from "@/features/charges/components/BalanceBlock";
 import { Statement } from "@/features/charges/components/Statement";
 import { daysLate, deriveStatus } from "@/features/charges/balance";
@@ -117,6 +119,15 @@ export default function TenantDetail() {
       ) : (
         <div className="space-y-6">
           <section className="space-y-3 rounded-md border border-line bg-surface p-4">
+            <div className="flex items-center gap-3 border-b border-line pb-3">
+              <InitialsTile name={tenant.name} size={48} />
+              <div className="min-w-0">
+                <p className="truncate text-body font-semibold text-ink">{tenant.name}</p>
+                <p className="text-secondary text-ink-muted">
+                  {room?.name ?? (roomQuery.isPending ? "Loading room" : "Room unavailable")}
+                </p>
+              </div>
+            </div>
             <DetailLine label="Room">
               {room ? (
                 <Link to={paths.roomDetail.replace("$roomId", room.id)} className="underline">
@@ -289,7 +300,7 @@ export default function TenantDetail() {
                 />
               )}
               <section className="space-y-3">
-                <h2 className="text-body font-semibold text-ink">Statement</h2>
+                <SectionHeader title="Statement" />
                 <Statement
                   charges={chargesQuery.data ?? []}
                   payments={paymentsQuery.data ?? []}

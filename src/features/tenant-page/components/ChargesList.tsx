@@ -1,5 +1,7 @@
 import { formatMonthLabel, formatShortDate } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
+import { ListCard } from "@/components/ui/ListRow";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import type { PublicTenantCharge } from "../charges";
 
 const labels: Record<PublicTenantCharge["type"], string> = {
@@ -31,10 +33,10 @@ export function ChargesList({
   if (charges.length === 0) return null;
   return (
     <section className="space-y-2">
-      <h2 className="text-body font-semibold text-ink">Charges</h2>
-      <ul className="divide-y divide-line border-y border-line">
+      <SectionHeader title="Charges" />
+      <ListCard>
         {charges.map((charge) => (
-          <li key={charge.id} className="space-y-1 py-3">
+          <li key={charge.id} className="list-none space-y-1 px-4 py-3">
             <div className="flex justify-between gap-3 text-body text-ink">
               <span className="font-semibold">
                 {labels[charge.type]}, {formatMonthLabel(charge.period)}
@@ -45,7 +47,7 @@ export function ChargesList({
             {charge.note && <p className="text-secondary text-ink">{charge.note}</p>}
           </li>
         ))}
-      </ul>
+      </ListCard>
     </section>
   );
 }

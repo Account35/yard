@@ -1,15 +1,17 @@
-import { Link } from "@tanstack/react-router";
-
-import { ListRow } from "@/components/ui/ListRow";
+import { InitialsTile } from "@/components/ui/InitialsTile";
+import { ListCard, ListRow } from "@/components/ui/ListRow";
+import { RowAmount } from "@/components/ui/RowAmount";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { StatusTag } from "@/components/ui/StatusTag";
 import type { TenantStatusGroup } from "@/features/charges/balance";
 import { formatShortDate } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
-import { paths } from "@/router/paths";
 
 interface StatusGroupProps {
   group: TenantStatusGroup;
   currentPeriodCharges: Map<string, number>;
+  onTenantClick: (tenantId: string) => void;
+  hideHeading?: boolean;
 }
 
 function summary(
@@ -47,31 +49,50 @@ function title(status: TenantStatusGroup["status"]): string {
   }
 }
 
-export function StatusGroup({ group, currentPeriodCharges }: StatusGroupProps) {
+export function StatusGroup({
+  group,
+  currentPeriodCharges,
+  onTenantClick,
+  hideHeading = false,
+}: StatusGroupProps) {
   return (
-    <section className="mb-5">
-      <h2 className="mb-1 text-body font-semibold text-ink">
-        {title(group.status)} ({group.tenants.length})
-      </h2>
-      <ul className="divide-y divide-line border-y border-line">
+    <section className="space-y-2">
+      {!hideHeading && (
+        <SectionHeader
+          title={title(group.status)}
+          dot={group.status}
+          trailing={`${group.tenants.length}`}
+        />
+      )}
+      <ListCard>
         {group.tenants.map((tenant) => (
-          <li key={tenant.tenantId}>
-            <Link to={paths.tenantDetail.replace("$tenantId", tenant.tenantId)} className="block">
-              <ListRow
-                primary={`${tenant.name} · ${tenant.roomName}`}
-                secondary={summary(
-                  group.status,
-                  tenant,
-                  currentPeriodCharges.get(tenant.tenantId) ??
-                    tenant.balanceCents + tenant.paidThisMonthCents,
-                )}
-                trailing={<StatusTag variant={group.status} status={group.status} />}
-                chevron
-              />
-            </Link>
-          </li>
+          <ListRow
+            key={tenant.tenantId}
+            primary={tenant.name}
+            secondary={`${tenant.roomName} · ${summary(
+              group.status,
+              tenant,
+              currentPeriodCharges.get(tenant.tenantId) ??
+                tenant.balanceCents + tenant.paidThisMonthCents,
+            )}`}
+            leading={<InitialsTile name={tenant.name} />}
+            trailing={
+              <>
+                <RowAmount cents={Math.abs(tenant.balanceCents)} />
+                <StatusTag variant={group.status} status={group.status} />
+              </>
+            }
+            chevron
+            onClick={() => onTenantClick(tenant.tenantId)}
+            summary={`${tenant.name}, ${tenant.roomName}. ${summary(
+              group.status,
+              tenant,
+              currentPeriodCharges.get(tenant.tenantId) ??
+                tenant.balanceCents + tenant.paidThisMonthCents,
+            )}. ${title(group.status)}.`}
+          />
         ))}
-      </ul>
+      </ListCard>
     </section>
   );
 }

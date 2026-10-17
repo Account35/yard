@@ -3,7 +3,9 @@ import { Link, useNavigate, useParams } from "@tanstack/react-router";
 
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
-import { ListRow } from "@/components/ui/ListRow";
+import { InitialsTile } from "@/components/ui/InitialsTile";
+import { ListCard, ListRow } from "@/components/ui/ListRow";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { RoomFormSheet } from "@/features/rooms/components/RoomFormSheet";
 import {
@@ -140,20 +142,26 @@ export default function RoomDetail() {
           )}
           {previousTenants.data && previousTenants.data.length > 0 && (
             <section>
-              <h2 className="mb-2 text-body font-semibold text-ink">Previous tenants</h2>
-              <ul className="divide-y divide-line border-y border-line">
+              <SectionHeader
+                title="Previous tenants"
+                trailing={String(previousTenants.data.length)}
+              />
+              <ListCard>
                 {previousTenants.data.map((tenant) => (
-                  <li key={tenant.id}>
-                    <Link to={paths.tenantDetail.replace("$tenantId", tenant.id)} className="block">
-                      <ListRow
-                        primary={tenant.name}
-                        secondary={`${formatShortDate(tenant.move_in_date)} – ${tenant.move_out_date ? formatShortDate(tenant.move_out_date) : ""}`}
-                        chevron
-                      />
-                    </Link>
-                  </li>
+                  <ListRow
+                    key={tenant.id}
+                    primary={tenant.name}
+                    secondary={`${formatShortDate(tenant.move_in_date)} – ${tenant.move_out_date ? formatShortDate(tenant.move_out_date) : ""}`}
+                    leading={<InitialsTile name={tenant.name} />}
+                    chevron
+                    onClick={() =>
+                      void navigate({
+                        to: paths.tenantDetail.replace("$tenantId", tenant.id),
+                      })
+                    }
+                  />
                 ))}
-              </ul>
+              </ListCard>
             </section>
           )}
         </div>

@@ -128,6 +128,16 @@ Differences from the original Phase 0 brief, required by the framework:
 - Tap targets at least 44px; buttons 48px high. No red button: destructive actions use
   the secondary variant with clear wording.
 - Plain human copy, no exclamation marks.
+- Prefer the shared visual primitives (`InitialsTile`, `IconTile`, `RowAmount`,
+  `SummaryPanel`, `SectionHeader`, `ListCard`, `ActionTile`, `FeatureCard`, `StepFlow`,
+  and `LedgerTable`) over one-off equivalents. Keep `ListRow` items directly inside a
+  `ListCard`; do not nest list items. Use a screen-reader summary when visual row content
+  is hidden from assistive technology.
+- Status tags use the matching tinted background, darker text and a labelled dot. Never
+  rely on the dot or colour alone to communicate payment status.
+- Use the 20px title and 28px figure tokens for prominent content; monetary figures use
+  tabular numerals. Keep dashboard setup steps visible until rooms, tenants and a confirmed
+  payment are all present.
 
 ## Auth and onboarding (Phase 1)
 

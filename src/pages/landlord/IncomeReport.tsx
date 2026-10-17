@@ -1,4 +1,6 @@
 import { PageHeader } from "@/components/layout/PageHeader";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { SummaryPanel } from "@/components/ui/SummaryPanel";
 import { buildMonthlyIncomeRows, buildOutstandingRows } from "@/features/reports/aggregate";
 import { MonthTable } from "@/features/reports/components/MonthTable";
 import { OutstandingList } from "@/features/reports/components/OutstandingList";
@@ -56,19 +58,25 @@ export default function IncomeReport() {
               <p className="py-6 text-body text-ink">{EMPTY_MESSAGE}</p>
             ) : (
               <>
-                <section className="space-y-1">
-                  <p className="text-body text-ink">
-                    Still owed to you: {formatMoney(currentOwed)}
-                  </p>
-                  {movedOutOwed > 0 && (
-                    <p className="text-body text-ink">
-                      From tenants who moved out: {formatMoney(movedOutOwed)}
-                    </p>
-                  )}
-                </section>
-                <MonthTable rows={rows} />
+                <SummaryPanel
+                  label="Still owed to you"
+                  figure={formatMoney(currentOwed)}
+                  secondary={
+                    movedOutOwed > 0
+                      ? `${formatMoney(movedOutOwed)} from tenants who moved out`
+                      : undefined
+                  }
+                  stats={[
+                    { label: "Current tenants", value: formatMoney(currentOwed) },
+                    { label: "Moved out", value: formatMoney(movedOutOwed) },
+                  ]}
+                />
                 <section className="space-y-3">
-                  <h2 className="text-body font-semibold text-ink">Who owes you</h2>
+                  <SectionHeader title="Monthly totals" />
+                  <MonthTable rows={rows} />
+                </section>
+                <section className="space-y-3">
+                  <SectionHeader title="Who owes you" trailing={String(outstanding.length)} />
                   <OutstandingList rows={outstanding} />
                 </section>
               </>

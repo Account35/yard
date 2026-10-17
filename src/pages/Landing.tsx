@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+import { Banknote, Droplets, Link2, MessageCircle, ReceiptText, UserRoundPlus } from "lucide-react";
 
 import { LEGAL_PAGES_READY } from "@/config";
+import { FeatureCard } from "@/components/ui/FeatureCard";
+import { StepFlow } from "@/components/ui/StepFlow";
 import { paths } from "@/router/paths";
 
 type InstallPromptEvent = Event & {
@@ -77,43 +80,56 @@ export default function Landing() {
 
         <section className="space-y-4 border-b border-line py-8">
           <h2 className="text-body font-semibold text-ink">What you can do</h2>
-          <ul className="space-y-4">
-            <li>
-              <p className="font-semibold">See who has paid.</p>
-              <p>Every tenant shows as paid, part paid, late or not due yet, with what they owe.</p>
-            </li>
-            <li>
-              <p className="font-semibold">Record payments and give receipts.</p>
-              <p>Each receipt has its own number and can be downloaded as a PDF.</p>
-            </li>
-            <li>
-              <p className="font-semibold">Split electricity and water.</p>
-              <p>
-                Choose equal shares, usage from meter readings, or your own amounts. Tenants can see
-                how their share was worked out.
-              </p>
-            </li>
-            <li>
-              <p className="font-semibold">Remind tenants on WhatsApp.</p>
-              <p>Yard writes the message for you. You press send.</p>
-            </li>
-            <li>
-              <p className="font-semibold">Give every tenant a private link.</p>
-              <p>
-                They see their balance, charges and receipts on their phone, with no app and no
-                account.
-              </p>
-            </li>
+          <ul className="grid gap-3">
+            <FeatureCard
+              icon={Banknote}
+              title="See who has paid."
+              line="Every tenant shows as paid, part paid, late or not due yet, with what they owe."
+            />
+            <FeatureCard
+              icon={ReceiptText}
+              title="Record payments and give receipts."
+              line="Each receipt has its own number and can be downloaded as a PDF."
+            />
+            <FeatureCard
+              icon={Droplets}
+              title="Split electricity and water."
+              line="Choose equal shares, usage from meter readings, or your own amounts. Tenants can see how their share was worked out."
+            />
+            <FeatureCard
+              icon={MessageCircle}
+              title="Remind tenants on WhatsApp."
+              line="Yard writes the message for you. You press send."
+            />
+            <FeatureCard
+              icon={Link2}
+              title="Give every tenant a private link."
+              line="They see their balance, charges and receipts on their phone, with no app and no account."
+            />
           </ul>
         </section>
 
         <section className="space-y-4 border-b border-line py-8">
           <h2 className="text-body font-semibold text-ink">How it works</h2>
-          <ol className="list-decimal space-y-3 pl-6">
-            <li>Sign in with your cellphone number. We send you a code by SMS.</li>
-            <li>Add your rooms and tenants. It takes about two minutes.</li>
-            <li>Each month, record payments and send reminders.</li>
-          </ol>
+          <StepFlow
+            steps={[
+              {
+                icon: UserRoundPlus,
+                title: "Sign in with your cellphone number.",
+                line: "We send you a code by SMS.",
+              },
+              {
+                icon: Banknote,
+                title: "Add your rooms and tenants.",
+                line: "It takes about two minutes.",
+              },
+              {
+                icon: ReceiptText,
+                title: "Each month,",
+                line: "record payments and send reminders.",
+              },
+            ]}
+          />
         </section>
 
         <section className="space-y-3 border-b border-line py-8">

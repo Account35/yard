@@ -1,7 +1,10 @@
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { Droplets } from "lucide-react";
 
+import { IconTile } from "@/components/ui/IconTile";
+import { ListRow } from "@/components/ui/ListRow";
+import { RowAmount } from "@/components/ui/RowAmount";
 import { formatMonthLabel, formatShortDate } from "@/lib/dates";
-import { formatMoney } from "@/lib/money";
 import { paths } from "@/router/paths";
 import { SPLIT_METHOD_LABELS, UTILITY_LABELS, type UtilityBill } from "@/types/domain";
 
@@ -14,24 +17,15 @@ function splitLabel(bill: UtilityBill): string {
 }
 
 export function BillRow({ bill }: { bill: UtilityBill }) {
+  const navigate = useNavigate();
   return (
-    <li>
-      <Link
-        to={paths.utilityDetail.replace("$billId", bill.id)}
-        className="block min-h-12 space-y-1 py-3 text-body text-ink"
-      >
-        <span className="flex items-start justify-between gap-3">
-          <span className="font-semibold underline">
-            {UTILITY_LABELS[bill.type]}, {formatMonthLabel(bill.period)}
-          </span>
-          <span className="shrink-0 money">{formatMoney(bill.total_cents)}</span>
-        </span>
-        <span className="flex justify-between gap-3 text-secondary text-ink-muted">
-          <span>{splitLabel(bill)}</span>
-          {bill.voided_at && <span>Undone</span>}
-          {!bill.voided_at && <span>Added {formatShortDate(bill.created_at.slice(0, 10))}</span>}
-        </span>
-      </Link>
-    </li>
+    <ListRow
+      primary={`${UTILITY_LABELS[bill.type]}, ${formatMonthLabel(bill.period)}`}
+      secondary={`${splitLabel(bill)} · ${bill.voided_at ? "Undone" : `Added ${formatShortDate(bill.created_at.slice(0, 10))}`}`}
+      leading={<IconTile icon={Droplets} />}
+      trailing={<RowAmount cents={bill.total_cents} />}
+      chevron
+      onClick={() => void navigate({ to: paths.utilityDetail.replace("$billId", bill.id) })}
+    />
   );
 }

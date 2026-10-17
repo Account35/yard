@@ -1,8 +1,12 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { House } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
-import { ListRow } from "@/components/ui/ListRow";
+import { IconTile } from "@/components/ui/IconTile";
+import { ListCard, ListRow } from "@/components/ui/ListRow";
+import { RowAmount } from "@/components/ui/RowAmount";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { deriveStatus } from "@/features/charges/balance";
 import { useTenantBalances } from "@/features/charges/hooks";
@@ -10,7 +14,6 @@ import { RoomFormSheet } from "@/features/rooms/components/RoomFormSheet";
 import { useCreateRoom, useInactiveRooms, useProperty } from "@/features/rooms/hooks";
 import { useCurrentTenants } from "@/features/tenants/hooks";
 import { ordinal } from "@/lib/dates";
-import { formatMoney } from "@/lib/money";
 import { naturalRoomSort } from "@/features/rooms/schema";
 import { paths } from "@/router/paths";
 import type { Room } from "@/types/domain";
@@ -19,6 +22,7 @@ import { useActiveRooms } from "../hooks";
 
 export function RoomsList() {
   const [addOpen, setAddOpen] = useState(false);
+  const navigate = useNavigate();
   const rooms = useActiveRooms();
   const inactiveRooms = useInactiveRooms();
   const tenants = useCurrentTenants();
@@ -70,52 +74,48 @@ export function RoomsList() {
       {ordered.length === 0 ? (
         <p className="py-8 text-body text-ink">No active rooms yet. Add your first room.</p>
       ) : (
-        <ul className="divide-y divide-line border-y border-line">
+        <ListCard>
           {ordered.map((room) => {
             const tenant = tenantByRoom.get(room.id);
             const tenantBalance = tenant ? balanceByTenant.get(tenant.id) : undefined;
             return (
-              <li key={room.id}>
-                <Link to={paths.roomDetail.replace("$roomId", room.id)} className="block">
-                  <ListRow
-                    primary={room.name}
-                    secondary={`Due on the ${ordinal(room.due_day)}`}
-                    trailing={
-                      <div className="flex items-center gap-2">
-                        <span className="money text-ink">
-                          {formatMoney(room.monthly_rent_cents)}
-                        </span>
-                        {tenant ? (
-                          <>
-                            <span className="max-w-28 truncate text-secondary text-ink">
-                              {tenant.name}
-                            </span>
-                            {balances.isPending ? (
-                              <span className="text-secondary text-ink-muted">Checking</span>
-                            ) : balances.isError ? (
-                              <span className="text-secondary text-ink-muted">Unavailable</span>
-                            ) : tenantBalance ? (
-                              <StatusTag status={deriveStatus(tenantBalance)} />
-                            ) : (
-                              <span className="text-secondary text-ink-muted">Unavailable</span>
-                            )}
-                          </>
-                        ) : tenants.isPending || tenants.isError ? (
-                          <span className="text-secondary text-ink-muted">
-                            {tenants.isPending ? "Checking" : "Unavailable"}
-                          </span>
-                        ) : (
-                          <StatusTag variant="vacant" />
-                        )}
-                      </div>
-                    }
-                    chevron
-                  />
-                </Link>
-              </li>
+              <ListRow
+                key={room.id}
+                primary={room.name}
+                secondary={
+                  tenant
+                    ? `${tenant.name} · Due on the ${ordinal(room.due_day)}`
+                    : `Due on the ${ordinal(room.due_day)}`
+                }
+                leading={<IconTile icon={House} />}
+                trailing={
+                  <>
+                    <RowAmount cents={room.monthly_rent_cents} />
+                    {tenant ? (
+                      balances.isPending ? (
+                        <span className="text-secondary text-ink-muted">Checking</span>
+                      ) : balances.isError ? (
+                        <span className="text-secondary text-ink-muted">Unavailable</span>
+                      ) : tenantBalance ? (
+                        <StatusTag status={deriveStatus(tenantBalance)} />
+                      ) : (
+                        <span className="text-secondary text-ink-muted">Unavailable</span>
+                      )
+                    ) : tenants.isPending || tenants.isError ? (
+                      <span className="text-secondary text-ink-muted">
+                        {tenants.isPending ? "Checking" : "Unavailable"}
+                      </span>
+                    ) : (
+                      <StatusTag variant="vacant" />
+                    )}
+                  </>
+                }
+                chevron
+                onClick={() => void navigate({ to: paths.roomDetail.replace("$roomId", room.id) })}
+              />
             );
           })}
-        </ul>
+        </ListCard>
       )}
       {inactiveRooms.isError && (
         <p role="alert" className="mt-4 text-secondary font-semibold text-ink">
@@ -124,21 +124,20 @@ export function RoomsList() {
       )}
       {inactiveOrdered.length > 0 && (
         <section className="mt-8">
-          <h2 className="mb-2 text-body font-semibold text-ink">Inactive rooms</h2>
-          <ul className="divide-y divide-line border-y border-line">
+          <SectionHeader title="Inactive rooms" />
+          <ListCard>
             {inactiveOrdered.map((room) => (
-              <li key={room.id}>
-                <Link to={paths.roomDetail.replace("$roomId", room.id)} className="block">
-                  <ListRow
-                    primary={room.name}
-                    secondary={`Due on the ${ordinal(room.due_day)}`}
-                    trailing={<StatusTag variant="inactive" />}
-                    chevron
-                  />
-                </Link>
-              </li>
+              <ListRow
+                key={room.id}
+                primary={room.name}
+                secondary={`Due on the ${ordinal(room.due_day)}`}
+                leading={<IconTile icon={House} />}
+                trailing={<StatusTag variant="inactive" />}
+                chevron
+                onClick={() => void navigate({ to: paths.roomDetail.replace("$roomId", room.id) })}
+              />
             ))}
-          </ul>
+          </ListCard>
         </section>
       )}
       <RoomFormSheet

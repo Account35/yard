@@ -2,6 +2,8 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/Button";
+import { InitialsTile } from "@/components/ui/InitialsTile";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { ConfirmSheet } from "@/features/payments/components/ConfirmSheet";
 import { DeclineSheet } from "@/features/payments/components/DeclineSheet";
 import { MessageSheet } from "@/features/messaging/components/MessageSheet";
@@ -77,12 +79,21 @@ export function PaymentDetailView({
         </p>
       )}
       <section className="space-y-3 rounded-md border border-line bg-surface p-4">
+        <SectionHeader title="Payment details" />
+        <div className="flex items-center gap-3 border-b border-line pb-3">
+          <InitialsTile name={receiptContext?.tenant.name ?? "Payment"} size={48} />
+          <div>
+            <p className="text-secondary text-ink-muted">Amount</p>
+            <p className="money text-figure font-semibold text-ink">
+              {formatMoney(payment.amount_cents)}
+            </p>
+          </div>
+        </div>
         {isWaitingTenantNotice && (
           <p className="border-b border-line pb-3 text-body font-semibold text-ink">
             Submitted by tenant on {formatShortDate(localDate(payment.created_at))}
           </p>
         )}
-        <Detail label="Amount">{formatMoney(payment.amount_cents)}</Detail>
         <Detail label="Date paid">{formatShortDate(payment.paid_on)}</Detail>
         <Detail label="Method">{PAYMENT_METHOD_LABELS[payment.method]}</Detail>
         <Detail label="Receipt">{payment.receipt_number ?? "Not available"}</Detail>
@@ -111,7 +122,7 @@ export function PaymentDetailView({
       </section>
       {payment.proof_url && (
         <section className="space-y-2">
-          <h2 className="text-body font-semibold text-ink">Proof</h2>
+          <SectionHeader title="Proof" />
           <ProofViewer path={payment.proof_url} />
         </section>
       )}

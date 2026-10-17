@@ -1,6 +1,8 @@
 import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
+import { ListCard } from "@/components/ui/ListRow";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { formatShortDate } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { parseSAPhone } from "@/lib/phone";
@@ -77,7 +79,7 @@ export function PublicTenantReceipts({
 
   return (
     <section className="space-y-3">
-      <h2 className="text-body font-semibold text-ink">Payment history and receipts</h2>
+      <SectionHeader title="Payment history and receipts" />
       {isPending ? (
         <p className="text-secondary text-ink-muted">Loading payment history...</p>
       ) : isError ? (
@@ -87,11 +89,11 @@ export function PublicTenantReceipts({
       ) : receipts.length === 0 ? (
         <p className="text-secondary text-ink-muted">No confirmed payments yet.</p>
       ) : (
-        <ul className="divide-y divide-line border-y border-line">
+        <ListCard>
           {receipts.map((receipt) => (
             <li
               key={receipt.receipt_number}
-              className="flex flex-wrap items-center justify-between gap-3 py-3"
+              className="flex list-none flex-wrap items-center justify-between gap-3 px-4 py-3"
             >
               <div>
                 <p className="money text-body font-semibold text-ink">
@@ -112,7 +114,7 @@ export function PublicTenantReceipts({
               </Button>
             </li>
           ))}
-        </ul>
+        </ListCard>
       )}
       {error && (
         <p role="alert" className="text-secondary text-ink">

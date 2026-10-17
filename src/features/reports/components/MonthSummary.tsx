@@ -1,4 +1,8 @@
 import { formatMoney } from "@/lib/money";
+import { ListCard, ListRow } from "@/components/ui/ListRow";
+import { RowAmount } from "@/components/ui/RowAmount";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { SummaryPanel } from "@/components/ui/SummaryPanel";
 import {
   PAYMENT_METHOD_LABELS,
   UTILITY_LABELS,
@@ -23,15 +27,12 @@ function Breakdown<T extends string>({
 }) {
   return (
     <section className="space-y-2">
-      <h2 className="text-body font-semibold text-ink">{title}</h2>
-      <ul className="divide-y divide-line border-y border-line">
+      <SectionHeader title={title} />
+      <ListCard>
         {entries.map(([key, amount, label]) => (
-          <li key={key} className="flex min-h-11 items-center justify-between gap-3 text-body">
-            <span>{label}</span>
-            <span className="text-right money text-ink">{formatMoney(amount)}</span>
-          </li>
+          <ListRow key={key} primary={label} trailing={<RowAmount cents={amount} />} />
         ))}
-      </ul>
+      </ListCard>
     </section>
   );
 }
@@ -44,8 +45,18 @@ export function MonthSummary({ detail }: { detail: MonthDetail }) {
     ([method, amount]) =>
       [method, amount, PAYMENT_METHOD_LABELS[method]] as [PaymentMethod, number, string],
   );
+  const chargedTotal = charged.reduce((total, [, amount]) => total + amount, 0);
+  const receivedTotal = received.reduce((total, [, amount]) => total + amount, 0);
   return (
     <div className="space-y-5">
+      <SummaryPanel
+        label="Received this month"
+        figure={formatMoney(receivedTotal)}
+        stats={[
+          { label: "Total charged", value: formatMoney(chargedTotal) },
+          { label: "Payment methods", value: String(detail.payments.length) },
+        ]}
+      />
       <Breakdown title="Charged" entries={charged} />
       <Breakdown title="Received" entries={received} />
     </div>

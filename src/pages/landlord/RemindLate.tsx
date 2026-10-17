@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import { PageHeader } from "@/components/layout/PageHeader";
+import { ListCard } from "@/components/ui/ListRow";
 import { useLandlord } from "@/features/auth/hooks";
 import { useTenantBalances } from "@/features/charges/hooks";
 import { RemindLateRow } from "@/features/messaging/components/RemindLateRow";
@@ -113,7 +114,7 @@ export default function RemindLate() {
             Nobody owes rent due in the next {upcomingDays} {upcomingDays === 1 ? "day" : "days"}.
           </p>
         ) : (
-          <ul className="divide-y divide-line border-y border-line">
+          <ListCard>
             {upcoming.map((candidate) => {
               const lastEntry = latest.get(`${candidate.tenant.id}:reminder`);
               const when =
@@ -130,7 +131,7 @@ export default function RemindLate() {
                 />
               );
             })}
-          </ul>
+          </ListCard>
         )}
       </section>
       <h2 className="mb-2 text-body font-semibold text-ink">Late</h2>
@@ -168,7 +169,7 @@ export default function RemindLate() {
               All late tenants were reminded within the last 3 days.
             </p>
           )}
-          <ul className="divide-y divide-line border-y border-line">
+          <ListCard>
             {sortedCandidates.map((candidate) => {
               const lastEntry = latest.get(`${candidate.tenant.id}:reminder`);
               return (
@@ -180,7 +181,7 @@ export default function RemindLate() {
                 />
               );
             })}
-          </ul>
+          </ListCard>
         </div>
       )}
     </>

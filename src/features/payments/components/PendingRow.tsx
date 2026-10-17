@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 
+import { InitialsTile } from "@/components/ui/InitialsTile";
+import { RowAmount } from "@/components/ui/RowAmount";
 import { formatShortDate } from "@/lib/dates";
-import { formatMoney } from "@/lib/money";
 import {
   PAYMENT_METHOD_LABELS,
   type PendingPaymentRow as PendingPaymentRowData,
@@ -15,16 +16,17 @@ export function PendingRow({ row }: { row: PendingPaymentRowData }) {
         to={paths.paymentDetail
           .replace("$tenantId", row.tenantId)
           .replace("$paymentId", row.paymentId)}
-        className="block min-h-12 space-y-1 py-3 text-body text-ink underline"
+        className="flex min-h-16 items-center gap-3 px-4 py-2 text-left text-ink"
       >
-        <span className="block font-semibold">
-          {row.tenantName} · {row.roomName}
+        <InitialsTile name={row.tenantName} />
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="truncate text-body font-semibold">{row.tenantName}</span>
+          <span className="truncate text-secondary text-ink-muted">
+            {row.roomName} · {formatShortDate(row.paidOn)} · {PAYMENT_METHOD_LABELS[row.method]}
+            {row.hasProof ? " · Proof attached" : ""}
+          </span>
         </span>
-        <span className="block">
-          {formatMoney(row.amountCents)} · paid {formatShortDate(row.paidOn)} ·{" "}
-          {PAYMENT_METHOD_LABELS[row.method]}
-        </span>
-        {row.hasProof && <span className="block text-secondary">Proof attached</span>}
+        <RowAmount cents={row.amountCents} />
       </Link>
     </li>
   );

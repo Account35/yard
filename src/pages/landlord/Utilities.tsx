@@ -2,6 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { ListCard } from "@/components/ui/ListRow";
 import { BillRow } from "@/features/utilities/components/BillRow";
 import { useProperty } from "@/features/rooms/hooks";
 import { useUtilityBills } from "@/features/utilities/hooks";
@@ -49,11 +50,11 @@ export default function Utilities() {
       {rows.length === 0 ? (
         <p className="py-6 text-body text-ink">No utility bills yet. Add your first bill.</p>
       ) : (
-        <ul className="divide-y divide-line border-y border-line">
+        <ListCard>
           {rows.map((bill) => (
             <BillRow key={bill.id} bill={bill} />
           ))}
-        </ul>
+        </ListCard>
       )}
     </>
   );

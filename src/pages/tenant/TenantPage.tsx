@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
 import { PageHeader } from "@/components/layout/PageHeader";
+import { InitialsTile } from "@/components/ui/InitialsTile";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { BalanceBlock } from "@/features/charges/components/BalanceBlock";
 import { daysLate } from "@/features/charges/balance";
 import { PublicTenantReceipts } from "@/features/tenants/components/PublicTenantReceipts";
@@ -128,7 +130,10 @@ export default function TenantPage() {
         <InvalidLink />
       ) : (
         <div className="space-y-4">
-          <p className="text-body text-ink">Hello, {tenant.tenant_name}.</p>
+          <div className="flex items-center gap-3">
+            <InitialsTile name={tenant.tenant_name} size={48} />
+            <p className="text-body font-semibold text-ink">Hello, {tenant.tenant_name}.</p>
+          </div>
           <section className="space-y-3 rounded-md border border-line bg-surface p-4">
             <DetailLine label="Property">{tenant.property_name}</DetailLine>
             <DetailLine label="Room">{tenant.room_name}</DetailLine>
@@ -174,7 +179,7 @@ export default function TenantPage() {
           )}
           <SubmissionsList info={paymentInfo} />
           <section className="space-y-3">
-            <h2 className="text-body font-semibold text-ink">Contact your landlord</h2>
+            <SectionHeader title="Contact your landlord" />
             <p className="text-secondary text-ink-muted">
               For questions about your rent, contact {tenant.landlord_name}.
             </p>

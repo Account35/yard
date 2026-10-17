@@ -1,5 +1,8 @@
 import { useMemo, useState } from "react";
 
+import { InitialsTile } from "@/components/ui/InitialsTile";
+import { RowAmount } from "@/components/ui/RowAmount";
+import { StatusTag } from "@/components/ui/StatusTag";
 import { formatShortDate, todayInSA } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { buildWhatsAppUrl } from "@/features/messaging/whatsapp";
@@ -59,22 +62,28 @@ export function RemindLateRow({ candidate, landlord, lastEntry, detail }: Remind
   const firstName = candidate.tenant.name.trim().split(/\s+/)[0] ?? candidate.tenant.name;
 
   return (
-    <li className="space-y-2 border-b border-line py-4">
-      <div>
-        <p className="text-body font-semibold text-ink">
-          {candidate.tenant.name} · {candidate.room.name}
-        </p>
-        <p className="text-secondary text-ink">
-          {detail ??
-            `Owes ${formatMoney(candidate.balance.balanceCents)}, ${candidate.daysLate} days late`}
-        </p>
-        {when && <p className="text-secondary text-ink-muted">{when}</p>}
-        {error && (
-          <p role="alert" className="text-secondary text-ink">
-            {error}
+    <li className="list-none space-y-3 border-b border-line bg-surface px-4 py-4 last:border-b-0">
+      <div className="flex items-start gap-3">
+        <InitialsTile name={candidate.tenant.name} />
+        <div className="min-w-0 flex-1">
+          <p className="text-body font-semibold text-ink">{candidate.tenant.name}</p>
+          <p className="text-secondary text-ink-muted">{candidate.room.name}</p>
+          <p className="mt-1 text-secondary text-ink">
+            {detail ??
+              `Owes ${formatMoney(candidate.balance.balanceCents)}, ${candidate.daysLate} days late`}
           </p>
-        )}
+          {when && <p className="text-secondary text-ink-muted">{when}</p>}
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <RowAmount cents={candidate.balance.balanceCents} />
+          <StatusTag variant={detail ? "not_due" : "late"} />
+        </div>
       </div>
+      {error && (
+        <p role="alert" className="text-secondary text-ink">
+          {error}
+        </p>
+      )}
       <div className="flex flex-wrap gap-2">
         {href && (
           <a
