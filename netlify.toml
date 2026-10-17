@@ -4,7 +4,7 @@
   publish = "dist/client"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
 
 # Every path serves the app shell; the app's router handles the rest.
 [[redirects]]
