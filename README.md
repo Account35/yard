@@ -77,7 +77,7 @@ bot and does not use the WhatsApp Business API.
 
 ## Requirements
 
-- Node.js 20 or later
+- Node.js 22.12 or later
 - npm
 - A Supabase project for authentication and application data
 - The Supabase CLI if generating TypeScript database types
@@ -272,7 +272,7 @@ configuration is in [netlify.toml](./netlify.toml):
 - Build command: `npm run build`
 - Publish directory: `dist/client`
 - Route fallback: `/_shell.html`
-- Node.js version: 20
+- Node.js major version: 22 (22.12 or later)
 
 Set the intended Supabase URL and anon key in the Netlify environment for the deploy
 context. Set `VITE_PUBLIC_APP_URL` to the canonical production origin so canonical and

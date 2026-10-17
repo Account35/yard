@@ -5,6 +5,9 @@
 - Build command: `npm run build`
 - Publish directory: `dist/client`
 - Every path is rewritten to `/_shell.html` with status 200, so links like `/t/abc` work.
+- Node.js 22 is selected for builds. The current TanStack Start and Supabase dependencies
+  require Node.js 22.12 or later; keep the Netlify `NODE_VERSION`, `.nvmrc`, and
+  `package.json` engine requirement aligned.
 
 ## Environment variables
 
