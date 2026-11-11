@@ -14,19 +14,48 @@ function normalizePhone(value: unknown): string | null {
   return digits.startsWith("27") && digits.length === 11 ? digits : null;
 }
 
-async function sendSmsPortal(destination: string, content: string): Promise<void> {
-  const clientId = Deno.env.get("SMSPORTAL_CLIENT_ID");
-  const secret = Deno.env.get("SMSPORTAL_SECRET");
-  if (!clientId || !secret) throw new Error("credentials are not configured");
+async function sendViaSmsPortal(to: string, text: string): Promise<void> {
+  const clientId = (Deno.env.get("SMSPORTAL_CLIENT_ID") ?? "").trim();
+  const secret = (Deno.env.get("SMSPORTAL_SECRET") ?? "").trim();
+  if (!clientId || !secret) throw new Error("SMSPortal keys missing");
+  const testMode = Deno.env.get("SMSPORTAL_TEST_MODE") === "true";
+
   const response = await fetch("https://rest.smsportal.com/v3/BulkMessages", {
     method: "POST",
     headers: {
       Authorization: `Basic ${btoa(`${clientId}:${secret}`)}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ messages: [{ content, destination }] }),
+    body: JSON.stringify({
+      sendOptions: { testMode },
+      messages: [{ content: text, destination: to }],
+    }),
   });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+  const body = await response.text();
+  if (!response.ok) throw new Error(`SMSPortal ${response.status}: ${body}`);
+
+  type SmsPortalResponse = {
+    sendResponse?: {
+      errorReport?: { faults?: unknown[]; noNetwork?: boolean };
+      messages?: number;
+    };
+  };
+  let data: SmsPortalResponse;
+  try {
+    data = JSON.parse(body) as SmsPortalResponse;
+  } catch {
+    throw new Error("SMSPortal returned an invalid response");
+  }
+
+  const report = data.sendResponse?.errorReport;
+  if (
+    (report?.faults?.length ?? 0) > 0 ||
+    report?.noNetwork ||
+    data.sendResponse?.messages === 0
+  ) {
+    throw new Error("SMSPortal rejected the destination");
+  }
 }
 
 async function sendTwilio(destination: string, content: string): Promise<void> {
@@ -82,10 +111,18 @@ Deno.serve(async (request) => {
 
   const content = `Your Yard code is ${otp}. It expires in 5 minutes. Don't share it with anyone.`;
   try {
-    await sendSmsPortal(phone, content);
+    await sendViaSmsPortal(phone, content);
     return json({});
   } catch {
     console.error("SMSPortal delivery failed", { phone: `***${phone.slice(-3)}` });
+  }
+  // Test mode is for validating SMSPortal without delivering a real SMS. Do not
+  // let the Twilio fallback turn a provider test into a live message.
+  if (Deno.env.get("SMSPORTAL_TEST_MODE") === "true") {
+    return json(
+      { error: { http_code: 500, message: "Could not send the verification SMS. Please try again." } },
+      500,
+    );
   }
   if (Deno.env.get("TWILIO_ACCOUNT_SID")) {
     try {
