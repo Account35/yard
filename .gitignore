@@ -33,4 +33,6 @@ dist-ssr
 
 .env.local
 .env
+.env.*
+!.env.example
 .netlify
