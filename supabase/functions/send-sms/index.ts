@@ -28,7 +28,7 @@ async function sendViaSmsPortal(to: string, text: string): Promise<void> {
     },
     body: JSON.stringify({
       sendOptions: { testMode },
-      messages: [{ content: text, destination: to }],
+      messages: [{ content: "Yard test 123456", destination: "27631819011" }],
     }),
   });
 
