@@ -46,7 +46,7 @@ describe("root landing route", () => {
     const getStartedLinks = screen.getAllByRole("link", { name: "Get started" });
     expect(getStartedLinks).toHaveLength(2);
     expect(getStartedLinks.every((link) => link.getAttribute("href") === "/sign-in")).toBe(true);
-    expect(screen.queryByRole("link", { name: /^Sign in$/ })).toBeNull();
+    expect(screen.getByRole("link", { name: "Sign in" }).getAttribute("href")).toBe("/sign-in");
     expect(authMocks.navigate).not.toHaveBeenCalled();
   });
 
