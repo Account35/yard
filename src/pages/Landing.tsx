@@ -47,12 +47,6 @@ export default function Landing() {
         <a className="text-body font-semibold text-ink no-underline" href={paths.landing}>
           Yard
         </a>
-        <a
-          className="inline-flex min-h-11 items-center justify-center rounded-sm border border-line-strong bg-ground px-4 text-body font-semibold text-ink"
-          href={paths.SIGN_IN}
-        >
-          Sign in
-        </a>
       </header>
       <main id="main-content" className="mx-auto max-w-xl pb-12">
         <section className="space-y-5 border-b border-line py-10">
@@ -70,11 +64,6 @@ export default function Landing() {
             >
               Get started
             </a>
-            <p>
-              <a className="text-ink underline" href={paths.SIGN_IN}>
-                Already use Yard? Sign in
-              </a>
-            </p>
           </div>
         </section>
 
